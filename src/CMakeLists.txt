@@ -1,8 +1,7 @@
 
-set(SRC group_bot.cpp)
+set(SRC bot_api.cpp bot_group.cpp bot_server.cpp server_bot.cpp)
 
-add_executable(code_test ${SRC})
+#add_library(bot_avim STATIC ${HDRS} ${SRCS})
 
-# Link libavim_bot.so only
-#target_link_libraries(code_test avim_bot)
+add_executable(bot ${SRC})
 
