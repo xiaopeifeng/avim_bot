@@ -8,21 +8,35 @@ namespace bot_avim {
 	, m_role(role)
 	{
 		LOG_DBG << "bot server constructor";
+		m_ios.reset(new boost::asio::io_service);
+		
 	}
 
 	bot_server::~bot_server()
 	{}
-
+	
 	void bot_server::start()
 	{
-
+		//TODO
+		//Bind local port
+		//Login
+		m_ios->run();
 	}
 
 	void bot_server::stop()
 	{
-		
+		m_ios->stop();
 	}
 
+	bool bot_server::write_packet()
+	{
+	}
+	
+	bool bot_server::handle_packet()
+	{
+	}
+
+	
 	bool bot_server::add_bot(const std::string& name, bot_role type)
 	{
 		return true;

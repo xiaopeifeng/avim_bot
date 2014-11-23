@@ -43,6 +43,7 @@ static int pass_cb(char *buf, int size, int rwflag, char *u)
 int bot_init(bot_context_t *ctx)
 {
 	// CA LOAD
+	OpenSSL_add_all_algorithms();
 	fs::path bot_key(ctx->key_path);
 	fs::path bot_cert(ctx->cert_path);
 	
