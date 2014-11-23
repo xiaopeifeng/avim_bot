@@ -11,14 +11,17 @@
 extern "C" {
 #endif
 
-typedef struct avim_bot_ctx{
-	const char *key_content;
-	const char *cert_content;
-	const char *bot_name;
-}avim_bot_context_t;
+typedef int (*bot_cb)(int type, char *msg);
 	
-int bot_init();
-
+typedef struct{
+	char *key_path;
+	char *cert_path;
+	int role;
+	const char *bot_name;
+}bot_context_t;
+	
+int bot_init(bot_context_t *ctx);
+int bot_reg_cb(bot_cb cb);
 int bot_create();
 int bot_setup();
 int bot_remove();

@@ -3,9 +3,11 @@
 
 namespace bot_avim {
 
-	bot_server::bot_server()
+	bot_server::bot_server(boost::shared_ptr<RSA> rsa, boost::shared_ptr<X509> x509_cert, bot_role role)
+	: m_ca(rsa, x509_cert)
+	, m_role(role)
 	{
-		
+		LOG_DBG << "bot server constructor";
 	}
 
 	bot_server::~bot_server()
@@ -21,7 +23,7 @@ namespace bot_avim {
 		
 	}
 
-	bool bot_server::add_bot(const std::string& name, bot_type type)
+	bool bot_server::add_bot(const std::string& name, bot_role type)
 	{
 		return true;
 	}
