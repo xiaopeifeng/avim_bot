@@ -60,7 +60,7 @@ namespace bot_avim {
 
 	private:
 		boost::asio::io_service& m_io_service;
-		router_server& m_server;
+		bot_server& m_server;
 		tcp::socket m_socket;
 		connection_manager* m_connection_manager;
 		boost::asio::streambuf m_request;

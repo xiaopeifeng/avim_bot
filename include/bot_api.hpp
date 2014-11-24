@@ -16,6 +16,10 @@ typedef int (*bot_cb)(int type, char *msg);
 typedef struct{
 	char *key_path;
 	char *cert_path;
+	char *bot_addr;
+	int bot_port;
+	char *server_addr;
+	int server_port;
 	int role;
 	const char *bot_name;
 }bot_context_t;

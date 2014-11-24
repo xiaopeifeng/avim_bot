@@ -74,7 +74,9 @@ int bot_init(bot_context_t *ctx)
 	//LOG_DBG << content_cert;
 	
 	//SERVER START
-	bot_server server(rsa_key, x509_cert, static_cast<bot_role>(ctx->role));
+	bot_server server(rsa_key, x509_cert);
+	server.set_role(static_cast<bot_role>(ctx->role));
+	server.set_conn(std::string(ctx->bot_addr), ctx->bot_port, std::string(ctx->server_addr), ctx->server_port);
 	server.start();
     return 0;
 }

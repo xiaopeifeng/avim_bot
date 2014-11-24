@@ -1,7 +1,7 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/any.hpp>
 #include "bot_server.hpp"
-#include "bot_connection.hpp"
+#include "connection.hpp"
 #include "logging.hpp"
 #include <bot_ca.hpp>
 #include "serialization.hpp"
@@ -34,7 +34,6 @@ namespace bot_avim {
 		if (ignore_ec)
 			LOG_ERR << "connection::start, Set option to nodelay, error message :" << ignore_ec.message();
 
-		m_server.do_connection_notify(0, shared_from_this());
 
 		boost::asio::async_read(m_socket, m_response, boost::asio::transfer_exactly(4),
 			boost::bind(&connection::handle_read_header,
@@ -47,7 +46,6 @@ namespace bot_avim {
 
 	void connection::stop()
 	{
-		m_server.do_connection_notify(1, shared_from_this());
 		boost::system::error_code ignore_ec;
 		m_abort = true;
 		m_socket.close(ignore_ec);
