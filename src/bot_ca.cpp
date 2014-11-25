@@ -5,7 +5,7 @@ namespace bot_avim {
 
 	bot_ca::bot_ca(boost::shared_ptr<RSA> rsa, boost::shared_ptr<X509> x509_cert)
 		: m_rsa(rsa)
-		, m_x509_cert(x509_cert)
+		, m_x509(x509_cert)
 	{
 		LOG_DBG << "bot ca constructor";
 	}
@@ -47,25 +47,56 @@ namespace bot_avim {
 		return 0;
 	}
 	
+	std::string &bot_ca::get_random_g()
+	{
+		return dh_random_g;
+	}
 	
-	std::string bot_ca::private_encrypt(RSA * rsa, const std::string & from)
+	std::string &bot_ca::get_random_p()
 	{
-		return RSA_private_encrypt(rsa, from);
+		return dh_random_p;
+	}
+	
+	std::string &bot_ca::get_pubkey()
+	{
+		return dh_client_pubkey;
+	}
+	
+	bool bot_ca::set_server_pubkey(std::string &pubkey)
+	{
+		dh_server_pubkey = pubkey;
+		return true;
+	}
+	
+	boost::shared_ptr<X509> bot_ca::get_shared_x509()
+	{
+		return m_x509;
+	}
+	
+	std::string bot_ca::private_encrypt(const std::string & from)
+	{	
+		return RSA_private_encrypt(m_rsa.get(), from);
 	}
 
-	std::string bot_ca::public_encrypt(RSA * rsa, const std::string & from)
+	std::string bot_ca::public_encrypt(const std::string & from)
 	{
-		return RSA_public_encrypt(rsa, from);
+		EVP_PKEY *key_tmp = X509_get_pubkey(m_x509.get());
+		rsa_st *user_rsa_pubkey = EVP_PKEY_get1_RSA(key_tmp);
+		EVP_PKEY_free(key_tmp);
+		return RSA_public_encrypt(user_rsa_pubkey, from);
 	}
 
-	std::string bot_ca::private_decrypt(RSA * rsa, const std::string & from)
+	std::string bot_ca::private_decrypt(const std::string & from)
 	{
-		return RSA_private_decrypt(rsa, from);
+		return RSA_private_decrypt(m_rsa.get(), from);
 	}
 
-	std::string bot_ca::public_decrypt(RSA * rsa, const std::string & from)
+	std::string bot_ca::public_decrypt(const std::string & from)
 	{
-		return RSA_public_decrypt(rsa, from);
+		EVP_PKEY *key_tmp = X509_get_pubkey(m_x509.get());
+		rsa_st *user_rsa_pubkey = EVP_PKEY_get1_RSA(key_tmp);
+		EVP_PKEY_free(key_tmp);
+		return RSA_public_decrypt(user_rsa_pubkey, from);
 	}
 	
 	

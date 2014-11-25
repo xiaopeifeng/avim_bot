@@ -111,15 +111,22 @@ namespace bot_avim {
 	public:
 		bool dh_generate_clientkey();
 		bool dh_generate_client_shared_key();
+		std::string &get_random_g();
+		std::string &get_random_p();
+		std::string &get_pubkey();
+		bool set_server_pubkey(std::string &pubkey);
 		
-		std::string private_encrypt(RSA * rsa, const std::string & from);
-		std::string public_encrypt(RSA * rsa, const std::string & from);
-		std::string private_decrypt(RSA * rsa, const std::string & from);
-		std::string public_decrypt(RSA * rsa, const std::string & from);
+		//boost::shared_ptr<RSA> get_shared_rsa(); // can not transfer private key
+		boost::shared_ptr<X509> get_shared_x509(); // public ca can transferd to server
+		
+		std::string private_encrypt(const std::string & from);
+		std::string public_encrypt(const std::string & from);
+		std::string private_decrypt(const std::string & from);
+		std::string public_decrypt(const std::string & from);
 
 	private:
 		boost::shared_ptr<RSA> m_rsa;
-		boost::shared_ptr<X509> m_x509_cert;
+		boost::shared_ptr<X509> m_x509;
 		
 		DH *dh_client;
 		std::string dh_random_g, dh_random_p;

@@ -13,7 +13,7 @@ option(OPENSSL_ENABLE "openssl test" ON)
 #  ENV
 ##############################################
 
-find_package(Boost 1.54 COMPONENTS program_options filesystem system thread REQUIRED)
+find_package(Boost 1.54 COMPONENTS program_options filesystem system thread regex REQUIRED)
 
 ####proto
 if(PROTO_ENABLE)

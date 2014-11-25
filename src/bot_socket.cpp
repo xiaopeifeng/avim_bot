@@ -57,14 +57,13 @@ namespace bot_avim {
 		auto resolved_host_iterator = resolver.resolve(boost::asio::ip::tcp::resolver::query("127.0.0.1", "24950"));
 		boost::asio::connect(m_socket, resolved_host_iterator);
 
-#if 0
+
 		m_response.consume(m_response.size());
 		m_abort = false;
 
 		m_socket.set_option(tcp::no_delay(true), ignore_ec);
 		if (ignore_ec)
 			LOG_ERR << "connection::start, Set option to nodelay, error message :" << ignore_ec.message();
-
 
 		boost::asio::async_read(m_socket, m_response, boost::asio::transfer_exactly(4),
 			boost::bind(&bot_socket::handle_read_header,
@@ -73,7 +72,6 @@ namespace bot_avim {
 				boost::asio::placeholders::bytes_transferred
 			)
 		);
-#endif
 	}
 
 	void bot_socket::stop()
