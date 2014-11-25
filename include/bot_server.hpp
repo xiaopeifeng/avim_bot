@@ -107,7 +107,7 @@ namespace bot_avim {
 		bool handle_login_result(google::protobuf::Message* msg);
 		
 	public:
-		bool write_packet(std::string &msg);
+		bool write_packet(const std::string &msg);
 		bool do_message(google::protobuf::Message*, bot_socket_ptr);
 		
 	private:
@@ -126,7 +126,7 @@ namespace bot_avim {
 		int m_server_por;
 		
 		bot_role m_role;
-		bot_status status;
+		bot_status m_status;
 		
 		boost::scoped_ptr<proto::av_address> m_local_addr;
 		boost::scoped_ptr<proto::av_address> m_remote_addr;

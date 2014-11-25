@@ -11,7 +11,7 @@ namespace bot_avim {
 	bot_server::bot_server(boost::shared_ptr<RSA> rsa, boost::shared_ptr<X509> x509_cert)
 	: m_ca(rsa, x509_cert)
 	{
-		status = BOT_STATUS_OFFLINE;
+		m_status = BOT_STATUS_OFFLINE;
 		m_role = BOT_ROLE_INVALID;
 		m_ios.reset(new boost::asio::io_service);
 		LOG_DBG << "bot server constructor";
@@ -53,8 +53,7 @@ namespace bot_avim {
 		client_hello.set_random_p(m_ca.get_random_p());
 		client_hello.set_random_pub_key(m_ca.get_pubkey());
 		
-		std::string response = encode(client_hello);
-		write_packet(response);
+		write_packet(encode(client_hello));
 		return true;
 		//av_router::encode(client_hello);
 	}
@@ -71,18 +70,32 @@ namespace bot_avim {
 		
 		// send login msg
 		std::string random_response = m_ca.private_encrypt(server_hello->random_pub_key());
-
+		
 		proto::login login_packet;
 		login_packet.set_user_cert(i2d_X509(m_ca.get_shared_x509().get()));
 		login_packet.set_encryped_radom_key(random_response);
-
-		std::string response = encode(login_packet);
-		write_packet(response);
+		
+		write_packet(encode(login_packet));
 		return true;
 	}
 	
 	bool bot_server::handle_login_result(google::protobuf::Message* msg)
-	{
+	{	
+		//LOGIN_SUCCEED = 0,
+		//NO_SUCH_USER = 1,
+		//PEREMISSON_DENIED = 2,
+		//PUBLIC_KEY_MISMATCH = 3
+	
+		proto::login_result *result = dynamic_cast<proto::login_result*>(msg);
+		if(result->result() == proto::login_result::LOGIN_SUCCEED)
+		{
+			LOG_DBG << "Login Succeed";
+			m_status = BOT_STATUS_ONLINE;
+			
+			add_bot("group@avplayer.org", BOT_ROLE_GROUP);
+		}
+		else
+			LOG_DBG << "Login Failed, err code:" << result->result();
 		return true;
 	}
 	
@@ -102,7 +115,7 @@ namespace bot_avim {
 		m_ios->stop();
 	}
 	
-	bool bot_server::write_packet(std::string &msg)
+	bool bot_server::write_packet(const std::string &msg)
 	{
 		m_socket.get()->write_msg(msg);
 	}
@@ -113,13 +126,50 @@ namespace bot_avim {
 		const std::string name = msg->GetTypeName();
 		
 		if(name == "proto.server_hello")
+		{
 			handle_server_hello(msg);
+			return true;
+		}
+		if(name == "proto.login_result")
+		{
+			handle_login_result(msg);
+			return true;
+		}
+		
+		//For other msg check login status
+		if(m_status < BOT_STATUS_ONLINE)
+		{
+			delete msg;
+			return true;
+		}
+		
+		// unkown msg type
+		if(name != "proto.avpacket")
+		{
+			delete msg;
+			return true;
+		}
+		
+		if(m_role == BOT_ROLE_GROUP)
+		{
+			return true;
+		}
+		
 		return true;
 	}
 	
 	bool bot_server::add_bot(const std::string& name, bot_role type)
 	{
-		return true;
+		if(m_role == BOT_ROLE_GROUP && type == BOT_ROLE_GROUP)
+		{
+			bot_group_ptr group(new bot_group(*this));
+			m_group_pool.push_back(group);
+			LOG_DBG << "add bot: " << name;
+			return true;
+		}
+		
+		LOG_DBG << "role type not match";
+		return false;
 	}
 
 	bool bot_server::del_bot(const std::string& name)
