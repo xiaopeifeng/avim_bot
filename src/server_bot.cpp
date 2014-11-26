@@ -53,16 +53,16 @@ void program_options_load(int argc, char **argv)
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
 	
-	if(argc == 1 || vm.count("help"))
+	if(vm.count("help"))
 	{
 		LOG_DBG << desc;
-		return;
+        exit(1);
 	}
 	
 	if(vm.count("version"))
 	{
 		LOG_DBG << "Version:0.1";
-		return;
+        exit(1);
 	}
 	
 	return;

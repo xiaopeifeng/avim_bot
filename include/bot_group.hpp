@@ -9,6 +9,7 @@
 
 namespace bot_avim {
 
+	typedef std::vector<std::string> member_ptr;
 	class bot_server;
 	
 	class bot_group
@@ -26,8 +27,7 @@ namespace bot_avim {
 		
 		void dump_status();
 		
-	private:
-		typedef std::vector<std::string> member_ptr;
+	private:		
 		member_ptr m_group_member_list;
 		bot_server &m_server;
 		

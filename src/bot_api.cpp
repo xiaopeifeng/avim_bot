@@ -46,7 +46,18 @@ int bot_init(bot_context_t *ctx)
 	OpenSSL_add_all_algorithms();
 	fs::path bot_key(ctx->key_path);
 	fs::path bot_cert(ctx->cert_path);
-	
+    
+	if (!fs::exists(bot_key))
+	{
+		LOG_DBG << "can not open " << bot_key;
+		exit(1);
+	}
+	if (!fs::exists(bot_cert))
+	{
+		LOG_DBG << "can not open " << bot_cert;
+		exit(1);
+	}
+
 	std::ifstream file_key(bot_key.c_str(), std::ios_base::binary | std::ios_base::in);
 	std::ifstream file_cert(bot_cert.c_str(), std::ios_base::binary | std::ios_base::in);
 	

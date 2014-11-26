@@ -95,13 +95,16 @@ namespace bot_avim {
 			m_status = BOT_STATUS_ONLINE;			
 			add_bot("group@avplayer.org", BOT_ROLE_GROUP);			
 			//For test send one pkt
-			proto::avpacket avpkt;
+            proto::avpacket avpkt;
 			proto::avim_message_packet message;
 			std::string text = std::string("test, for group test!");	
 			message.mutable_avim()->Add()->mutable_item_text()->set_text(text);
-			avpkt.mutable_dest()->CopyFrom(av_address_from_string("test@avplayer.org"));
-			avpkt.mutable_src()->CopyFrom(av_address_from_string("peter@avplayer.org"));
-			avpkt.set_payload(encode_message(message));			
+			avpkt.mutable_dest()->CopyFrom(av_address_from_string("group@avplayer.org"));
+			avpkt.mutable_src()->CopyFrom(av_address_from_string("group@avplayer.org"));
+			avpkt.set_payload(encode_message(message));
+			avpkt.set_upperlayerpotocol("group");
+			avpkt.set_time_to_live(64);
+			avpkt.set_publickey(m_ca.get_pubkey());
 			write_packet(encode(avpkt));			
 			LOG_DBG << "Send test pkt ok";
 		}
@@ -163,6 +166,12 @@ namespace bot_avim {
 		
 		if(m_role == BOT_ROLE_GROUP)
 		{
+			if(m_group_pool.size() > 0)
+			{
+				//member_ptr::iterator it = m_group_pool.begin();
+				//(*it)->handle_message(msg);
+				m_group_pool.at(0).get()->handle_message(msg);
+			}
 			return true;
 		}
 		
