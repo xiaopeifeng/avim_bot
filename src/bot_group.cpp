@@ -39,6 +39,7 @@ namespace bot_avim {
 			// trans
 			pkt->mutable_dest()->CopyFrom(av_address_from_string(m_group_member_list.at(i)));
 			m_server.write_packet(encode(*pkt));
+			LOG_DBG << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << pkt->src().username();
 			
 		}
 		return true;

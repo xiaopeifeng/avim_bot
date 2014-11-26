@@ -5,6 +5,8 @@
 #include "bot_ca.hpp"
 #include "bot_socket.hpp"
 #include "user.pb.h"
+#include "im.pb.h"
+#include "message.hpp"
 
 namespace bot_avim {
 
@@ -90,9 +92,18 @@ namespace bot_avim {
 		if(result->result() == proto::login_result::LOGIN_SUCCEED)
 		{
 			LOG_DBG << "Login Succeed";
-			m_status = BOT_STATUS_ONLINE;
-			
-			add_bot("group@avplayer.org", BOT_ROLE_GROUP);
+			m_status = BOT_STATUS_ONLINE;			
+			add_bot("group@avplayer.org", BOT_ROLE_GROUP);			
+			//For test send one pkt
+			proto::avpacket avpkt;
+			proto::avim_message_packet message;
+			std::string text = std::string("test, for group test!");	
+			message.mutable_avim()->Add()->mutable_item_text()->set_text(text);
+			avpkt.mutable_dest()->CopyFrom(av_address_from_string("test@avplayer.org"));
+			avpkt.mutable_src()->CopyFrom(av_address_from_string("peter@avplayer.org"));
+			avpkt.set_payload(encode_message(message));			
+			write_packet(encode(avpkt));			
+			LOG_DBG << "Send test pkt ok";
 		}
 		else
 			LOG_DBG << "Login Failed, err code:" << result->result();
