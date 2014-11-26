@@ -1,3 +1,3 @@
-[submodule "avim_proto_doc"]
-	path = avim_proto_doc
-	url = https://github.com/avplayer/avim_proto_doc.git
+[submodule "avim"]
+	path = avim
+	url = git://github.com/avplayer/avim.git
