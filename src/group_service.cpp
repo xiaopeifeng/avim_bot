@@ -154,6 +154,7 @@ int main(int argc, char* argv[])
 	keyfilecontent.assign(outbuf, l);
 	keyfile.reset();
 
+	std::cout << "get key cert conternt \n";
 	// 读入 key 和 cert 的内容
 	avim.reset(new avim_client(io_service, keyfilecontent, certfilecontent));
 
