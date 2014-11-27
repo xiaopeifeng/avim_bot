@@ -23,11 +23,14 @@ include_directories(
 	${OPENSSL_INCLUDE_DIR}
 	${CMAKE_CURRENT_BINARY_DIR}/avim/
 	include/
-	avim/libavproto/include/
+	libavproto/include/
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+link_libraries(${Boost_LIBRARIES})
+link_libraries(${OPENSSL_LIBRARIES})
 
-add_subdirectory(avim)
+add_subdirectory(libavproto)
+add_subdirectory(avim_proto)
 
 add_subdirectory(src)
