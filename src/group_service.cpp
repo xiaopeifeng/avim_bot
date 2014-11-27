@@ -48,6 +48,20 @@ static void msg_reader(boost::asio::yield_context yield_context)
 		}
 
 		std::cerr << std::endl;
+		
+		// Send Group List to member
+		proto::avim_message_packet response;
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("hyq@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("luofei@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("michael.fan@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("microcai@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("mrshelly@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("xosdy@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("zxf@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("peter@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("test-client@avplayer.org");
+		
+		avim->async_send_im(av_address_from_string(av_address_to_string(sender)), msgpkt, yield_context);		
 	}
 }
 
