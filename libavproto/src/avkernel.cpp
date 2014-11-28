@@ -180,7 +180,8 @@ class avkernel_impl : boost::noncopyable , public boost::enable_shared_from_this
 		{
 			if (avPacket->upperlayerpotocol() == "agmp")
 			{
-				payload = avPacket->payload();
+				std::cout << "agmp comming" << std::endl;
+				//payload = avPacket->payload();
 			}
 			else
 			{
