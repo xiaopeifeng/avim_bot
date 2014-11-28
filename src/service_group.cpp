@@ -27,6 +27,8 @@ static boost::asio::io_service io_service;
 
 boost::scoped_ptr<avim_client> avim;
 
+std::vector<std::string> m_group_list;
+
 static void msg_reader(boost::asio::yield_context yield_context)
 {
 	boost::system::error_code ec;
@@ -37,6 +39,27 @@ static void msg_reader(boost::asio::yield_context yield_context)
 	{
 		avim->async_recv_im([](proto::av_address){return false;}, sender, msgpkt, yield_context);
 
+		
+		if(av_address_to_string(sender) == "group@avplayer.org")
+		{
+			std::cout << "From group, maybe test pkt" << std::endl;
+			continue;
+		}
+		
+		// CMD-HANDLE
+		// Send Group List to member		
+		for(int i = 0; i < m_group_list.size(); i++)
+		{
+			//if(av_address_to_string(sender) == m_group_list.at(i))
+			//{
+			//	continue;
+			//}
+			avim->async_send_im(av_address_from_string(m_group_list.at(i)), msgpkt, yield_context);
+			std::cout << "Trans avpkt to: " << m_group_list.at(i) <<" From: " << av_address_to_string(sender) << std::endl;
+		}
+		
+		
+		
 		std::cerr << "接收到的数据： " << av_address_to_string(sender) << "说: ";
 
 		for (proto::avim_message im_message_item : msgpkt.avim())
@@ -49,8 +72,12 @@ static void msg_reader(boost::asio::yield_context yield_context)
 
 		std::cerr << std::endl;
 		
-		// Send Group List to member
+
+		
+#if 0
 		proto::avim_message_packet response;
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("Jack@avplayer.org");
+		response.mutable_avim()->Add()->mutable_item_text()->set_text("dpainter@avplayer.org");
 		response.mutable_avim()->Add()->mutable_item_text()->set_text("hyq@avplayer.org");
 		response.mutable_avim()->Add()->mutable_item_text()->set_text("luofei@avplayer.org");
 		response.mutable_avim()->Add()->mutable_item_text()->set_text("michael.fan@avplayer.org");
@@ -60,8 +87,9 @@ static void msg_reader(boost::asio::yield_context yield_context)
 		response.mutable_avim()->Add()->mutable_item_text()->set_text("zxf@avplayer.org");
 		response.mutable_avim()->Add()->mutable_item_text()->set_text("peter@avplayer.org");
 		response.mutable_avim()->Add()->mutable_item_text()->set_text("test-client@avplayer.org");
-		
-		avim->async_send_im(av_address_from_string(av_address_to_string(sender)), msgpkt, yield_context);		
+		std::cout << "send list to: " << av_address_to_string(sender) << std::endl;
+		avim->async_send_im(av_address_from_string(av_address_to_string(sender)), response, yield_context);	
+#endif
 	}
 }
 
@@ -83,6 +111,8 @@ static void msg_login_and_send(std::string to, boost::asio::yield_context yield_
 		// 进入 IM 过程，发送一个 test  到 test2@avplayer.org
 		avim->async_send_im(av_address_from_string(to), msgpkt, yield_context);
 	}
+	
+	
 }
 
 int pass_cb(char *buf, int size, int rwflag, char *u)
@@ -169,6 +199,19 @@ int main(int argc, char* argv[])
 	keyfile.reset();
 
 	std::cout << "get key cert conternt \n";
+	
+	m_group_list.push_back("Jack@avplayer.org");
+	m_group_list.push_back("dpainter@avplayer.org");
+	m_group_list.push_back("hyq@avplayer.org");
+	m_group_list.push_back("luofei@avplayer.org");
+	m_group_list.push_back("michael.fan@avplayer.org");
+	m_group_list.push_back("microcai@avplayer.org");
+	m_group_list.push_back("mrshelly@avplayer.org");
+	m_group_list.push_back("xosdy@avplayer.org");
+	m_group_list.push_back("zxf@avplayer.org");
+	m_group_list.push_back("peter@avplayer.org");
+	m_group_list.push_back("test-client@avplayer.org");
+	
 	// 读入 key 和 cert 的内容
 	avim.reset(new avim_client(io_service, keyfilecontent, certfilecontent));
 
