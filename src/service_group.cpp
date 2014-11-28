@@ -38,7 +38,18 @@ static void msg_reader(boost::asio::yield_context yield_context)
 	for (;;)
 	{
 		avim->async_recv_im([](proto::av_address){return false;}, sender, msgpkt, yield_context);
+	
+		std::cerr << "接收到的数据： " << av_address_to_string(sender) << "说: ";
 
+		for (proto::avim_message im_message_item : msgpkt.avim())
+		{
+			if (im_message_item.has_item_text())
+			{
+				std::cerr << im_message_item.item_text().text() << std::endl;
+			}
+		}
+
+		std::cerr << std::endl;
 		
 		if(av_address_to_string(sender) == "group@avplayer.org")
 		{
@@ -54,26 +65,11 @@ static void msg_reader(boost::asio::yield_context yield_context)
 			//{
 			//	continue;
 			//}
-			avim->async_send_im(av_address_from_string(m_group_list.at(i)), msgpkt, yield_context);
 			std::cout << "Trans avpkt to: " << m_group_list.at(i) <<" From: " << av_address_to_string(sender) << std::endl;
-		}
-		
-		
-		
-		std::cerr << "接收到的数据： " << av_address_to_string(sender) << "说: ";
+			avim->async_send_im(av_address_from_string(m_group_list.at(i)), msgpkt, yield_context);
+			
+		}	
 
-		for (proto::avim_message im_message_item : msgpkt.avim())
-		{
-			if (im_message_item.has_item_text())
-			{
-				std::cerr << im_message_item.item_text().text() << std::endl;
-			}
-		}
-
-		std::cerr << std::endl;
-		
-
-		
 #if 0
 		proto::avim_message_packet response;
 		response.mutable_avim()->Add()->mutable_item_text()->set_text("Jack@avplayer.org");

@@ -32,8 +32,8 @@ void avim_client::coroutine_login(boost::asio::yield_context yield_context)
 	boost::asio::ip::tcp::resolver resolver(io_service);
 	m_socket.reset( new boost::asio::ip::tcp::socket(io_service));
 
-	auto resolved_host_iterator = resolver.async_resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "24950"), yield_context);
-	//auto resolved_host_iterator = resolver.async_resolve(boost::asio::ip::tcp::resolver::query("127.0.0.1", "24950"), yield_context);
+	//auto resolved_host_iterator = resolver.async_resolve(boost::asio::ip::tcp::resolver::query("avim.avplayer.org", "24950"), yield_context);
+	auto resolved_host_iterator = resolver.async_resolve(boost::asio::ip::tcp::resolver::query("127.0.0.1", "24950"), yield_context);
 
 	boost::asio::async_connect(*m_socket, resolved_host_iterator, yield_context);
 
