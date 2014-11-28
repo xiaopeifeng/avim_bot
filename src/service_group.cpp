@@ -31,7 +31,8 @@ std::vector<std::string> m_group_list;
 
 void send_msb_cb(boost::system::error_code ec)
 {
-	std::cout << "send ok" <<std::endl;
+	if(ec)
+		std::cout << "send failed, err msg:" << ec.message()  <<std::endl;
 }
 
 static void msg_reader(boost::asio::yield_context yield_context)

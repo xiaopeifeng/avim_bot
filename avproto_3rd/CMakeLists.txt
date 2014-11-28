@@ -5,9 +5,9 @@ project(avim_bot)
 ##############################################
 #  OPTION
 ##############################################
-option(PROTO_ENABLE "enable proto test" ON)
+option(PROTO_ENABLE "enable proto test" OFF)
 option(SOCI_ENABLE "soci-postgresql test" OFF)
-option(OPENSSL_ENABLE "openssl test" ON)
+option(OPENSSL_ENABLE "openssl test" OFF)
 
 ##############################################
 #  ENV
