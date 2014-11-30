@@ -23,8 +23,6 @@ namespace fs = boost::filesystem;
 
 // 一个非常非常简单的 IM 实现，测试用途
 
-
-
 boost::scoped_ptr<avim_client> avim;
 
 std::vector<std::string> m_group_list;
