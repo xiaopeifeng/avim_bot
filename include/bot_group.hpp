@@ -15,6 +15,12 @@ namespace bot_avim {
 
 	typedef std::vector<std::string> member_ptr;
 	
+	typedef enum
+	{
+		GROUP_STATUS_OFFLINE  = 0,
+		GROUP_STATUS_ONLINE   = 1,
+	}group_status;
+	
 	class bot_group
 		: public boost::noncopyable
 	{
@@ -26,7 +32,8 @@ namespace bot_avim {
 		bool add_member(const std::string& name);
 		bool del_member(const std::string& name);
 		
-		bool handle_message(int type, std::string msg);
+		bool handle_message(int type, proto::avim_message_packet pkt);
+		bool status_changed(int status);
 		
 		void dump_status();
 		
@@ -36,7 +43,7 @@ namespace bot_avim {
 	private:		
 		member_ptr m_group_member_list;
 		boost::asio::io_service& m_io_service;
-		
+		group_status m_status;
 		//avproto only
 		boost::shared_ptr<avim_client> avim;
 		avproto_wrapper m_avproto;

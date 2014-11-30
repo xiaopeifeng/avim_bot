@@ -34,10 +34,11 @@ namespace bot_avim {
 
 	public:
 		bool register_service(bot_group *group);
-		void connect_coroutine(boost::asio::yield_context yield_context);
 		bool start();
+		void connect_coroutine(boost::asio::yield_context yield_context);
 		bool login(boost::asio::yield_context yield_context);
-		bool handle_message();
+		bool handle_message(boost::asio::yield_context yield_context);
+		bool write_msg(std::string target, proto::avim_message_packet &pkt);
 		
 	private:		
 		boost::asio::io_service& m_io_service;
@@ -46,6 +47,7 @@ namespace bot_avim {
 		boost::shared_ptr<bot_group> m_service;
 		std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 		std::shared_ptr<avjackif> m_avif;
+		avkernel m_avkernel;
 	};
 	
 }

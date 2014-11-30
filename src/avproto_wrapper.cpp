@@ -4,6 +4,7 @@
 
 #include "avproto.hpp"
 #include "avjackif.hpp"
+#include "message.hpp"
 
 #include <openssl/x509.h>
 #include <openssl/pem.h>
@@ -15,6 +16,7 @@ namespace bot_avim {
 	: m_io_service(io_service)
 	, m_key(key)
 	, m_crt(crt)
+	, m_avkernel(io_service)
 	{
 		LOG_DBG << "bot group constructor";
 	}
@@ -83,11 +85,30 @@ namespace bot_avim {
 		{
 			std::cout << "login success " << std::endl;
 		}
+		
+		// start message_receiver
+		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::handle_message, this, std::placeholders::_1));
+		
+		m_service.get()->status_changed(1);
 		return true;
 	}
 	
-	bool avproto_wrapper::handle_message()
+	bool avproto_wrapper::handle_message(boost::asio::yield_context yield_context)
 	{
+		for(;;)
+		{
+			std::string target,data;
+			m_avkernel.async_recvfrom(target, data, yield_context);
+			m_service.get()->handle_message(0, decode_message(data));
+		}
 		return true;
 	}
+	
+	bool avproto_wrapper::write_msg(std::string target, proto::avim_message_packet &pkt)
+	{
+		m_avkernel.async_sendto(target, encode_message(pkt), [](boost::system::error_code ec){
+			std::cout << "send ok" << std::endl;
+		});
+	}
+	
 }
