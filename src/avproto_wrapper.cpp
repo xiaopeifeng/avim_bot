@@ -5,6 +5,10 @@
 #include "avproto.hpp"
 #include "avjackif.hpp"
 
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/evp.h>
+
 namespace bot_avim {
 
 	avproto_wrapper::avproto_wrapper(boost::asio::io_service& io_service, std::string key, std::string crt)
@@ -21,6 +25,11 @@ namespace bot_avim {
 	bool avproto_wrapper::register_service(bot_group *group)
 	{
 		m_service.reset(group);
+	}
+	
+	bool avproto_wrapper::start()
+	{
+		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::connect_coroutine, this, std::placeholders::_1));
 	}
 	
 	void avproto_wrapper::connect_coroutine(boost::asio::yield_context yield_context)
@@ -51,18 +60,25 @@ namespace bot_avim {
 			return;
 		}
 		std::cout << "connection established " << std::endl;
-	}
-	
-	bool avproto_wrapper::start()
-	{
-		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::connect_coroutine, this, std::placeholders::_1));
 		m_avif.reset(new avjackif(m_socket));
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::login, this, std::placeholders::_1));
 	}
 	
 	bool avproto_wrapper::login(boost::asio::yield_context yield_context)
 	{
-		m_avif->set_pki(m_key, m_crt);
+		boost::shared_ptr<BIO> keyfile(BIO_new_mem_buf(&m_key[0], m_key.length()), BIO_free);
+		boost::shared_ptr<BIO> certfile(BIO_new_mem_buf(&m_crt[0], m_crt.length()), BIO_free);
+
+		std::shared_ptr<RSA> m_rsa_key;
+		std::shared_ptr<X509> m_x509_cert;
+		m_rsa_key.reset(
+		PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0), //(pem_password_cb*)pass_cb,(void*) key.c_str()),
+		RSA_free
+		);
+
+		m_x509_cert.reset(PEM_read_bio_X509(certfile.get(), 0, 0, 0), X509_free);
+		
+		m_avif->set_pki(m_rsa_key, m_x509_cert);
 		if (m_avif->async_handshake(yield_context))
 		{
 			std::cout << "login success " << std::endl;
