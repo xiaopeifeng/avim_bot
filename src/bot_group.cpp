@@ -4,8 +4,8 @@
 namespace bot_avim {
 
 	bot_group::bot_group(boost::asio::io_service& io_service, std::string key, std::string crt)
-	: m_io_service(io_service)
-	, m_avproto(m_io_service, key, crt)
+	: bot_service(io_service, key, crt)
+	, m_avproto(io_service, key, crt)
 	, m_status(GROUP_STATUS_OFFLINE)
 	{
 		// tmp op - add member
@@ -28,16 +28,19 @@ namespace bot_avim {
 	bot_group::~bot_group()
 	{}
 
-	bool bot_group::status_changed(int status)
+	bool bot_group::notify(int cmd, int ext1, int ext2)
 	{
-		m_status = static_cast<group_status>(status);
-		
-		if(m_status == GROUP_STATUS_ONLINE)
+		if(cmd == CMD_STATE_CHANGED)
 		{
-			// send test pkt
-			proto::avim_message_packet pkt;
-			pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
-			m_avproto.write_msg("test-client@avplayer.org", pkt);
+			m_status = static_cast<group_status>(ext1);
+			if(m_status == GROUP_STATUS_ONLINE)
+			{
+				// send test pkt
+				proto::avim_message_packet pkt;
+				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
+				m_avproto.write_msg("test-client@avplayer.org", pkt);
+				return true;
+			}
 		}
 	}
 	

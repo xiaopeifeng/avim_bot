@@ -15,7 +15,7 @@ class avkernel;
 
 namespace bot_avim {
 	
-	class bot_group;
+	class bot_service;
 	
 	enum msg_type
 	{
@@ -33,18 +33,20 @@ namespace bot_avim {
 		~avproto_wrapper();
 
 	public:
-		bool register_service(bot_group *group);
+		bool register_service(bot_service *service);
 		bool start();
+		bool write_msg(std::string target, proto::avim_message_packet &pkt);
+		
+	private:
 		void connect_coroutine(boost::asio::yield_context yield_context);
 		bool login_coroutine(boost::asio::yield_context yield_context);
 		bool handle_message(boost::asio::yield_context yield_context);
-		bool write_msg(std::string target, proto::avim_message_packet &pkt);
-		
+	
 	private:		
 		boost::asio::io_service& m_io_service;
 		std::string m_key;
 		std::string m_crt;
-		boost::shared_ptr<bot_group> m_service;
+		boost::shared_ptr<bot_service> m_service;
 		std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 		std::shared_ptr<avjackif> m_avif;
 		avkernel m_avkernel;

@@ -5,6 +5,7 @@
 #include "avproto.hpp"
 #include "avjackif.hpp"
 #include "message.hpp"
+#include "bot_service.hpp"
 
 #include <openssl/x509.h>
 #include <openssl/pem.h>
@@ -24,9 +25,9 @@ namespace bot_avim {
 	avproto_wrapper::~avproto_wrapper()
 	{}
 	
-	bool avproto_wrapper::register_service(bot_group *group)
+	bool avproto_wrapper::register_service(bot_service *service)
 	{
-		m_service.reset(group);
+		m_service.reset(service);
 	}
 	
 	bool avproto_wrapper::start()
@@ -93,7 +94,7 @@ namespace bot_avim {
 		// start message_receiver
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::handle_message, this, std::placeholders::_1));
 		
-		m_service.get()->status_changed(1);
+		m_service.get()->notify(0, 1, 0);
 		return true;
 	}
 	

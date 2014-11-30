@@ -11,6 +11,8 @@
 #include "message.pb.h"
 #include "avproto_wrapper.hpp"
 
+#include "bot_service.hpp"
+
 namespace bot_avim {
 
 	typedef std::vector<std::string> member_ptr;
@@ -21,8 +23,11 @@ namespace bot_avim {
 		GROUP_STATUS_ONLINE   = 1,
 	}group_status;
 	
+	// CMD START FROM  0X100
+	const int CMD_GROUP_TEST = 0x100;
+	
 	class bot_group
-		: public boost::noncopyable
+		: public bot_service
 	{
 	public:
 		explicit bot_group(boost::asio::io_service& io_service, std::string key, std::string crt);
@@ -34,6 +39,7 @@ namespace bot_avim {
 		
 		bool handle_message(int type, std::string sender, proto::avim_message_packet pkt);
 		bool status_changed(int status);
+		bool notify(int cmd, int ext1, int ext2);
 		
 		void dump_status();
 		
@@ -42,10 +48,7 @@ namespace bot_avim {
 		
 	private:		
 		member_ptr m_group_member_list;
-		boost::asio::io_service& m_io_service;
 		group_status m_status;
-		//avproto only
-		boost::shared_ptr<avim_client> avim;
 		avproto_wrapper m_avproto;
 	};
 	
