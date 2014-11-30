@@ -32,7 +32,7 @@ namespace bot_avim {
 		bool add_member(const std::string& name);
 		bool del_member(const std::string& name);
 		
-		bool handle_message(int type, proto::avim_message_packet pkt);
+		bool handle_message(int type, std::string sender, proto::avim_message_packet pkt);
 		bool status_changed(int status);
 		
 		void dump_status();

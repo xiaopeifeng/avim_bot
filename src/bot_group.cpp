@@ -53,9 +53,35 @@ namespace bot_avim {
 		return true;
 	}
 	
-	bool bot_group::handle_message(int type, proto::avim_message_packet pkt)
+	bool bot_group::handle_message(int type, std::string sender, proto::avim_message_packet msgpkt)
 	{
 		std::cout << "get pkt" << std::endl;
+		
+		for (proto::avim_message im_message_item : msgpkt.avim())
+		{
+			if (im_message_item.has_item_text())
+			{
+				std::cerr << im_message_item.item_text().text() << std::endl;
+			}
+		}
+		
+		if(sender == "group@avplayer.org")
+		{
+			std::cout << "From group, maybe test pkt" << std::endl;
+			return true;
+		}
+		
+		// Send Group List to member		
+		for(int i = 0; i < m_group_member_list.size(); i++)
+		{
+			if(sender == m_group_member_list.at(i))
+			{
+				continue;
+			}
+			std::cout << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << sender << std::endl;
+			m_avproto.write_msg(m_group_member_list.at(i), msgpkt);
+		}	
+		
 		return true;
 	}
 	

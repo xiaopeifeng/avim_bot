@@ -63,10 +63,10 @@ namespace bot_avim {
 		}
 		std::cout << "connection established " << std::endl;
 		m_avif.reset(new avjackif(m_socket));
-		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::login, this, std::placeholders::_1));
+		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::login_coroutine, this, std::placeholders::_1));
 	}
 	
-	bool avproto_wrapper::login(boost::asio::yield_context yield_context)
+	bool avproto_wrapper::login_coroutine(boost::asio::yield_context yield_context)
 	{
 		boost::shared_ptr<BIO> keyfile(BIO_new_mem_buf(&m_key[0], m_key.length()), BIO_free);
 		boost::shared_ptr<BIO> certfile(BIO_new_mem_buf(&m_crt[0], m_crt.length()), BIO_free);
@@ -86,6 +86,10 @@ namespace bot_avim {
 			std::cout << "login success " << std::endl;
 		}
 		
+		m_avkernel.add_interface(m_avif);
+		std::string me_addr = av_address_to_string(*m_avif->if_address());
+		m_avkernel.add_route(".+@.+", me_addr, m_avif->get_ifname(), 100);
+		
 		// start message_receiver
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::handle_message, this, std::placeholders::_1));
 		
@@ -99,7 +103,7 @@ namespace bot_avim {
 		{
 			std::string target,data;
 			m_avkernel.async_recvfrom(target, data, yield_context);
-			m_service.get()->handle_message(0, decode_message(data));
+			m_service.get()->handle_message(0,target, decode_message(data));
 		}
 		return true;
 	}
@@ -107,7 +111,10 @@ namespace bot_avim {
 	bool avproto_wrapper::write_msg(std::string target, proto::avim_message_packet &pkt)
 	{
 		m_avkernel.async_sendto(target, encode_message(pkt), [](boost::system::error_code ec){
-			std::cout << "send ok" << std::endl;
+			if(ec)
+				std::cout << "send failed, msg: " << ec.message() << std::endl;
+			else
+				std::cout << "send ok" << std::endl;
 		});
 	}
 	

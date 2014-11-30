@@ -36,7 +36,7 @@ namespace bot_avim {
 		bool register_service(bot_group *group);
 		bool start();
 		void connect_coroutine(boost::asio::yield_context yield_context);
-		bool login(boost::asio::yield_context yield_context);
+		bool login_coroutine(boost::asio::yield_context yield_context);
 		bool handle_message(boost::asio::yield_context yield_context);
 		bool write_msg(std::string target, proto::avim_message_packet &pkt);
 		
