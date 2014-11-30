@@ -4,11 +4,14 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/spawn.hpp>
 
 #include "message.pb.h"
 #include "serialization.hpp"
-#include "avim.hpp"
 #include "message.pb.h"
+
+#include "bot_avproto.hpp"
+#include "avproto.hpp"
 
 class avjackif;
 class avkernel;
@@ -26,27 +29,23 @@ namespace bot_avim {
 	};
 	
 	class avproto_wrapper
-		: public boost::noncopyable
+		: public bot_avproto
 	{
 	public:
 		explicit avproto_wrapper(boost::asio::io_service& io_service, std::string key, std::string crt);
 		~avproto_wrapper();
 
 	public:
-		bool register_service(bot_service *service);
-		bool start();
-		bool write_msg(std::string target, proto::avim_message_packet &pkt);
+		virtual bool register_service(bot_service *service);
+		virtual bool start();
+		virtual bool write_msg(std::string target, proto::avim_message_packet &pkt);
 		
-	private:
+	public:
 		void connect_coroutine(boost::asio::yield_context yield_context);
 		bool login_coroutine(boost::asio::yield_context yield_context);
 		bool handle_message(boost::asio::yield_context yield_context);
 	
 	private:		
-		boost::asio::io_service& m_io_service;
-		std::string m_key;
-		std::string m_crt;
-		boost::shared_ptr<bot_service> m_service;
 		std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 		std::shared_ptr<avjackif> m_avif;
 		avkernel m_avkernel;

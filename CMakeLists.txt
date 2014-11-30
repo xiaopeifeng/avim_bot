@@ -6,6 +6,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# proto select
+option(AVPROTO_ENABLE "use libavproto" ON)
+option(AVPROTO_3RD_ENABLE "use libavproto_3rd" OFF)
+
 # service on-off
 option(SERVICE_GROUP_ENABLE "build group service" ON)
 

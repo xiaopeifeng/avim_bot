@@ -7,7 +7,6 @@
 
 #include "message.pb.h"
 #include "serialization.hpp"
-#include "avim.hpp"
 #include "message.pb.h"
 #include "avproto_wrapper.hpp"
 
@@ -49,7 +48,8 @@ namespace bot_avim {
 	private:		
 		member_ptr m_group_member_list;
 		group_status m_status;
-		avproto_wrapper m_avproto;
+		boost::shared_ptr<bot_avproto> m_avproto;
+		//avproto_wrapper m_avproto;
 	};
 	
 }

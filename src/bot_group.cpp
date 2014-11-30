@@ -5,7 +5,6 @@ namespace bot_avim {
 
 	bot_group::bot_group(boost::asio::io_service& io_service, std::string key, std::string crt)
 	: bot_service(io_service, key, crt)
-	, m_avproto(io_service, key, crt)
 	, m_status(GROUP_STATUS_OFFLINE)
 	{
 		// tmp op - add member
@@ -19,8 +18,10 @@ namespace bot_avim {
 		add_member("peter@avplayer.org");
 		add_member("test-client@avplayer.org");
 		
-		m_avproto.register_service(this);
-		m_avproto.start();
+		m_avproto.reset(new avproto_wrapper(io_service, key, crt));
+		
+		m_avproto.get()->register_service(this);
+		m_avproto.get()->start();
 		
 		LOG_DBG << "bot group constructor";
 	}
@@ -38,7 +39,7 @@ namespace bot_avim {
 				// send test pkt
 				proto::avim_message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
-				m_avproto.write_msg("test-client@avplayer.org", pkt);
+				m_avproto.get()->write_msg("test-client@avplayer.org", pkt);
 				return true;
 			}
 		}
@@ -82,7 +83,7 @@ namespace bot_avim {
 				continue;
 			}
 			std::cout << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << sender << std::endl;
-			m_avproto.write_msg(m_group_member_list.at(i), msgpkt);
+			m_avproto.get()->write_msg(m_group_member_list.at(i), msgpkt);
 		}	
 		
 		return true;
