@@ -3,8 +3,8 @@
 #include "bot_group.hpp"
 
 #include "avproto.hpp"
-#include "avjackif.hpp"
-#include "message.hpp"
+#include "avproto/avjackif.hpp"
+#include "avproto/message.hpp"
 #include "bot_service.hpp"
 
 #include <openssl/x509.h>
@@ -61,7 +61,8 @@ namespace bot_avim {
 			return;
 		}
 		std::cout << "connection established " << std::endl;
-		m_avif.reset(new avjackif(m_socket));
+		//m_avif.reset(new avjackif(m_socket));
+		m_avif.reset(new avjackif(m_io_service));
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::login_coroutine, this, std::placeholders::_1));
 	}
 	

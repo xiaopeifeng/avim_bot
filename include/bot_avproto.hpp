@@ -5,8 +5,8 @@
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
-#include "serialization.hpp"
-#include "message.pb.h"
+#include "avproto/serialization.hpp"
+#include "packet.pb.h"
 #include "im.pb.h"
 
 namespace bot_avim {
@@ -28,7 +28,7 @@ namespace bot_avim {
 	public:
 		virtual bool register_service(bot_service *service){m_service.reset(service); return true;};
 		virtual bool start(){return true;};
-		virtual bool write_msg(std::string target, proto::avim_message_packet &pkt){return true;};
+		virtual bool write_msg(std::string target, message::message_packet &pkt){return true;};
 		
 	protected:		
 		boost::asio::io_service& m_io_service;

@@ -5,8 +5,8 @@
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
-#include "serialization.hpp"
-#include "message.pb.h"
+#include "avproto/serialization.hpp"
+#include "packet.pb.h"
 
 namespace bot_avim {
 	
@@ -26,7 +26,7 @@ namespace bot_avim {
 		~bot_service(){};
 
 	public:	
-		virtual bool handle_message(int type, std::string sender, proto::avim_message_packet pkt){return true;};
+		virtual bool handle_message(int type, std::string sender, message::message_packet pkt){return true;};
 		virtual bool notify(int cmd, int ext1 = 0, int ext2 = 0){return true;};
 		
 	private:		

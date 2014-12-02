@@ -6,9 +6,8 @@
 #include <boost/asio.hpp>
 #include <boost/asio/spawn.hpp>
 
-#include "message.pb.h"
-#include "serialization.hpp"
-#include "message.pb.h"
+#include "avproto/serialization.hpp"
+#include "packet.pb.h"
 
 #include "bot_avproto.hpp"
 #include "avproto.hpp"
@@ -38,14 +37,15 @@ namespace bot_avim {
 	public:
 		virtual bool register_service(bot_service *service);
 		virtual bool start();
-		virtual bool write_msg(std::string target, proto::avim_message_packet &pkt);
+		virtual bool write_msg(std::string target, message::message_packet &pkt);
 		
 	public:
 		void connect_coroutine(boost::asio::yield_context yield_context);
 		bool login_coroutine(boost::asio::yield_context yield_context);
 		bool handle_message(boost::asio::yield_context yield_context);
 	
-	private:		
+	private:
+		boost::asio::io_service m_io_service;
 		std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 		std::shared_ptr<avjackif> m_avif;
 		avkernel m_avkernel;

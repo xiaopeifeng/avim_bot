@@ -5,9 +5,8 @@
 #include <boost/thread.hpp>
 #include <boost/asio.hpp>
 
-#include "message.pb.h"
-#include "serialization.hpp"
-#include "message.pb.h"
+#include "packet.pb.h"
+#include "avproto/serialization.hpp"
 #include "avproto_wrapper.hpp"
 
 #include "bot_service.hpp"
@@ -36,7 +35,7 @@ namespace bot_avim {
 		bool add_member(const std::string& name);
 		bool del_member(const std::string& name);
 		
-		bool handle_message(int type, std::string sender, proto::avim_message_packet pkt);
+		bool handle_message(int type, std::string sender, message::message_packet pkt);
 		bool status_changed(int status);
 		bool notify(int cmd, int ext1, int ext2);
 		
