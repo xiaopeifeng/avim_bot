@@ -57,11 +57,17 @@ namespace bot_avim {
 		return true;
 	}
 	
-	bool bot_group::handle_message(int type, std::string sender, message::message_packet msgpkt)
+	bool bot_group::handle_message(int type, std::string &sender, im_message msgpkt)
 	{
 		std::cout << "get pkt" << std::endl;
 		
-		for (message::avim_message im_message_item : msgpkt.avim())
+		if(msgpkt.is_group_message == 0)
+		{
+			return false;
+		}
+		
+		
+		for (message::avim_message im_message_item : msgpkt.impkt.avim())
 		{
 			if (im_message_item.has_item_text())
 			{
@@ -83,7 +89,7 @@ namespace bot_avim {
 				continue;
 			}
 			std::cout << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << sender << std::endl;
-			m_avproto.get()->write_msg(m_group_member_list.at(i), msgpkt);
+			m_avproto.get()->write_msg(m_group_member_list.at(i), msgpkt.impkt);
 		}	
 		
 		return true;

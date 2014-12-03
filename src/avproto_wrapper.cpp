@@ -17,7 +17,7 @@ namespace bot_avim {
 	: bot_avproto(io_service, key, crt)
 	, m_avkernel(io_service)
 	{
-		LOG_DBG << "bot group constructor";
+		LOG_DBG << "avproto constructor";
 	}
 
 	avproto_wrapper::~avproto_wrapper()
@@ -37,7 +37,7 @@ namespace bot_avim {
 	{
 		boost::system::error_code ec;
 		using namespace boost::asio::ip;
-
+#if 0
 		tcp::resolver resolver(m_io_service);
 
 		auto _debug_host = getenv("AVIM_HOST");
@@ -62,6 +62,7 @@ namespace bot_avim {
 		}
 		std::cout << "connection established " << std::endl;
 		//m_avif.reset(new avjackif(m_socket));
+#endif
 		m_avif.reset(new avjackif(m_io_service));
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::login_coroutine, this, std::placeholders::_1));
 	}
@@ -81,6 +82,8 @@ namespace bot_avim {
 		m_x509_cert.reset(PEM_read_bio_X509(certfile.get(), 0, 0, 0), X509_free);
 		
 		m_avif->set_pki(m_rsa_key, m_x509_cert);
+		auto _debug_host = getenv("AVIM_HOST");
+		bool ret = m_avif->async_connect(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context);
 		if (m_avif->async_handshake(yield_context))
 		{
 			std::cout << "login success " << std::endl;
@@ -108,7 +111,7 @@ namespace bot_avim {
 		return true;
 	}
 	
-	bool avproto_wrapper::write_msg(std::string target, proto::avim_message_packet &pkt)
+	bool avproto_wrapper::write_msg(std::string target, message::message_packet &pkt)
 	{
 		m_avkernel.async_sendto(target, encode_message(pkt), [](boost::system::error_code ec){
 			if(ec)

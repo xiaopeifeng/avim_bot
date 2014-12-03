@@ -7,7 +7,9 @@
 
 #include "avproto/serialization.hpp"
 #include "packet.pb.h"
+#include "im.pb.h"
 
+struct im_message;
 namespace bot_avim {
 	
 	// 0x0 - 0xFF - Common cmd
@@ -26,7 +28,7 @@ namespace bot_avim {
 		~bot_service(){};
 
 	public:	
-		virtual bool handle_message(int type, std::string sender, message::message_packet pkt){return true;};
+		virtual bool handle_message(int type, std::string &sender, im_message pkt){return true;};
 		virtual bool notify(int cmd, int ext1 = 0, int ext2 = 0){return true;};
 		
 	private:		
