@@ -80,10 +80,11 @@ namespace bot_avim {
 		);
 
 		m_x509_cert.reset(PEM_read_bio_X509(certfile.get(), 0, 0, 0), X509_free);
-		
 		m_avif->set_pki(m_rsa_key, m_x509_cert);
 		auto _debug_host = getenv("AVIM_HOST");
 		bool ret = m_avif->async_connect(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context);
+		std::cout << "connect ok" << std::endl;
+		//bool ret = m_avif->async_connect("127.0.0.1", "24950", yield_context);
 		if (m_avif->async_handshake(yield_context))
 		{
 			std::cout << "login success " << std::endl;

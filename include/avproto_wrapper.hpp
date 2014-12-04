@@ -45,8 +45,6 @@ namespace bot_avim {
 		bool handle_message(boost::asio::yield_context yield_context);
 	
 	private:
-		boost::asio::io_service m_io_service;
-		std::shared_ptr<boost::asio::ip::tcp::socket> m_socket;
 		std::shared_ptr<avjackif> m_avif;
 		avkernel m_avkernel;
 	};

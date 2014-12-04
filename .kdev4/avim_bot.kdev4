@@ -15,5 +15,8 @@ Environment Profile=
 Extra Arguments=
 Install Directory=file:///usr/local
 
+[Launch]
+Launch Configurations=
+
 [Project]
 VersionControlSupport=kdevgit

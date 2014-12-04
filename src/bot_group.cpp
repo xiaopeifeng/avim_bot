@@ -39,7 +39,7 @@ namespace bot_avim {
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
-				m_avproto.get()->write_msg("test-client@avplayer.org", pkt);
+				m_avproto.get()->write_msg("group@avplayer.org", pkt);
 				return true;
 			}
 		}
@@ -60,12 +60,12 @@ namespace bot_avim {
 	bool bot_group::handle_message(int type, std::string &sender, im_message msgpkt)
 	{
 		std::cout << "get pkt" << std::endl;
-		
+#if 0
 		if(msgpkt.is_group_message == 0)
 		{
 			return false;
 		}
-		
+#endif	
 		
 		for (message::avim_message im_message_item : msgpkt.impkt.avim())
 		{

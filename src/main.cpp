@@ -17,6 +17,7 @@ namespace fs = boost::filesystem;
 #include <openssl/evp.h>
 
 #include "bot_group.hpp"
+#include <bot_client.hpp>
 
 static boost::asio::io_service io_service;
 
@@ -60,10 +61,10 @@ int main(int argc, char* argv[])
 	po::variables_map vm;
 	po::options_description desc("qqbot options");
 	desc.add_options()
-	("key", po::value<fs::path>(&key)->default_value("test.key"), "path to private key")
-	("cert", po::value<fs::path>(&cert)->default_value("test.crt"), "path to cert")
+	("key", po::value<fs::path>(&key)->default_value("group.key"), "path to private key")
+	("cert", po::value<fs::path>(&cert)->default_value("group.crt"), "path to cert")
 	("help,h", "display this help")
-	("service", po::value<int>(&service_type)->default_value(0), "service type, 0 - group service")
+	("service", po::value<int>(&service_type)->default_value(0), "service type, 0 - client 1 - group service")
 	("to", po::value<std::string>(&to), "send test message to, default to send to your self");
 	
 
@@ -121,19 +122,19 @@ int main(int argc, char* argv[])
 
 	std::cout << "get key cert conternt \n";
 	
-	boost::shared_ptr<bot_avim::bot_group> group_service;
+	boost::shared_ptr<bot_avim::bot_service> service;
 	
 	if(service_type == 0)
 	{
-		std::cout << "Strat group service." << std::endl;
-		group_service.reset(new bot_avim::bot_group(io_service, keycontent, crtcontent));
-		//bot_group group_service(io_service, keycontent, crtcontent);
+		std::cout << "Strat client." << std::endl;
+		service.reset(new bot_avim::bot_client(io_service, keycontent, crtcontent));
 	}
-	else
+	
+	if(service_type == 1)
 	{
-		std::cout << "service unkown." << std::endl;
-		exit(1);
-	}	
+		std::cout << "Strat group service." << std::endl;
+		service.reset(new bot_avim::bot_group(io_service, keycontent, crtcontent));
+	}
 	
 	io_service.run();
 }
