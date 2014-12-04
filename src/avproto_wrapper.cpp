@@ -112,9 +112,9 @@ namespace bot_avim {
 		return true;
 	}
 	
-	bool avproto_wrapper::write_msg(std::string target, message::message_packet &pkt)
+	bool avproto_wrapper::write_packet(std::string target, std::string &pkt)
 	{
-		m_avkernel.async_sendto(target, encode_message(pkt), [](boost::system::error_code ec){
+		m_avkernel.async_sendto(target, pkt, [](boost::system::error_code ec){
 			if(ec)
 				std::cout << "send failed, msg: " << ec.message() << std::endl;
 			else

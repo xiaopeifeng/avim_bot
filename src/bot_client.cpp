@@ -1,6 +1,8 @@
 #include "logging.hpp"
 #include "bot_client.hpp"
 
+#include "group.pb.h"
+
 namespace bot_avim {
 
 	bot_client::bot_client(boost::asio::io_service& io_service, std::string key, std::string crt)
@@ -28,7 +30,16 @@ namespace bot_avim {
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
-				m_avproto.get()->write_msg("group@avplayer.org", pkt);
+				std::string content = encode_message(pkt);
+				m_avproto.get()->write_packet("group@avplayer.org", content);
+				
+				// get group list
+#if 0
+				proto::group::group_list_request request;
+				request.set_group_id(0);
+				request.set_group_name("avim main group");
+				m_avproto.get()->write_packet("group@avplayer.org", request);
+#endif
 				return true;
 			}
 		}

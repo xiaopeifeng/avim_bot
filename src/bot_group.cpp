@@ -39,7 +39,8 @@ namespace bot_avim {
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
-				m_avproto.get()->write_msg("group@avplayer.org", pkt);
+				std::string content = encode_message(pkt);
+				m_avproto.get()->write_packet("group@avplayer.org", content);
 				return true;
 			}
 		}
@@ -81,6 +82,7 @@ namespace bot_avim {
 			return true;
 		}
 		
+		std::string content = encode_message(msgpkt.impkt);
 		// Send Group List to member		
 		for(int i = 0; i < m_group_member_list.size(); i++)
 		{
@@ -89,7 +91,7 @@ namespace bot_avim {
 				continue;
 			}
 			std::cout << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << sender << std::endl;
-			m_avproto.get()->write_msg(m_group_member_list.at(i), msgpkt.impkt);
+			m_avproto.get()->write_packet(m_group_member_list.at(i), content);
 		}	
 		
 		return true;
