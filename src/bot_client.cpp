@@ -29,7 +29,7 @@ namespace bot_avim {
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
 				std::string content = encode_im_message(pkt);
-				m_avproto.get()->write_packet("group@avplayer.org", content);
+				m_avproto.get()->write_packet("peter@avplayer.org", content);
 				
 				// get group list
 #if 0	
@@ -44,6 +44,21 @@ namespace bot_avim {
 				return true;
 			}
 		}
+	}
+	
+	bool bot_client::handle_message(int type, std::string &sender, im_message msgpkt)
+	{
+		std::cout << "get im message" << std::endl;
+
+		for (message::avim_message im_message_item : msgpkt.impkt.avim())
+		{
+			if (im_message_item.has_item_text())
+			{
+				std::cerr << im_message_item.item_text().text() << std::endl;
+			}
+		}
+		
+		return true;
 	}
 	
 	bool bot_client::handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr)
