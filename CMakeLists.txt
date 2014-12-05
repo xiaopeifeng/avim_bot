@@ -31,7 +31,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 link_libraries(${Boost_LIBRARIES})
 link_libraries(${OPENSSL_LIBRARIES})
 
-add_subdirectory(libavproto)
+add_subdirectory(libavim)
 add_subdirectory(avim_proto)
 
 add_subdirectory(src)
