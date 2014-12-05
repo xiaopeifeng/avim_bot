@@ -30,3 +30,6 @@
 # Other
 build
 tags
+.kde*
+*.kde*
+
