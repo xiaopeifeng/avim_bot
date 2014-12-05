@@ -16,9 +16,9 @@ class avjackif;
 class avkernel;
 
 namespace bot_avim {
-	
+
 	class bot_service;
-	
+
 	enum msg_type
 	{
 		MESSAGE_TEXT  = 0,
@@ -26,27 +26,27 @@ namespace bot_avim {
 		MESSAGE_VIDEO = 2,
 		MESSAGE_CMD   = 3
 	};
-	
+
 	class avproto_wrapper
 		: public bot_avproto
 	{
 	public:
-		explicit avproto_wrapper(boost::asio::io_service& io_service, std::string key, std::string crt);
+		explicit avproto_wrapper(boost::asio::io_service& io_service, std::shared_ptr<RSA> key, std::shared_ptr<X509> crt);
 		~avproto_wrapper();
 
 	public:
 		virtual bool register_service(bot_service *service);
 		virtual bool start();
 		virtual bool write_packet(std::string target, std::string &pkt);
-		
+
 	public:
 		void connect_coroutine(boost::asio::yield_context yield_context);
 		bool login_coroutine(boost::asio::yield_context yield_context);
 		bool handle_message(boost::asio::yield_context yield_context);
-	
+
 	private:
 		std::shared_ptr<avjackif> m_avif;
 		avkernel m_avkernel;
 	};
-	
+
 }

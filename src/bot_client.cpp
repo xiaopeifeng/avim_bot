@@ -4,15 +4,15 @@
 
 namespace bot_avim {
 
-	bot_client::bot_client(boost::asio::io_service& io_service, std::string key, std::string crt)
-	: bot_service(io_service, key, crt)
-	, m_status(CLIENT_STATUS_OFFLINE)
-	{	
+	bot_client::bot_client(boost::asio::io_service& io_service, std::shared_ptr<RSA> key, std::shared_ptr<X509> crt)
+		: bot_service(io_service, key, crt)
+		, m_status(CLIENT_STATUS_OFFLINE)
+	{
 		m_avproto.reset(new avproto_wrapper(io_service, key, crt));
-		
+
 		m_avproto.get()->register_service(this);
 		m_avproto.get()->start();
-		
+
 		LOG_DBG << "bot client constructor";
 	}
 
@@ -32,9 +32,9 @@ namespace bot_avim {
 				std::string content = encode_im_message(pkt);
 				std::string target("group@avplayer.org");
 				m_avproto.get()->write_packet(target, content);
-				
+
 				// get group list
-#if 1				
+#if 1
 				proto::group::list_request request;
 				request.set_id(0);
 				std::string addr_group("group@avplayer.org");
@@ -46,7 +46,7 @@ namespace bot_avim {
 			}
 		}
 	}
-	
+
 	bool bot_client::handle_message(int type, std::string &sender, im_message msgpkt)
 	{
 		std::cout << "get im message" << std::endl;
@@ -58,10 +58,10 @@ namespace bot_avim {
 				std::cerr << im_message_item.item_text().text() << std::endl;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	bool bot_client::handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr)
 	{
 		std::cout << "get pkt" << std::endl;
@@ -76,7 +76,7 @@ namespace bot_avim {
 				std::cout << "group request failed " << std::endl;
 				return false;
 			}
-			
+
 			int size = response_ptr->list_size();
 			std::cout << "list count " << size << std::endl;
 			for(int i=0; i < size; i++)
@@ -84,12 +84,12 @@ namespace bot_avim {
 				std::string addr = response_ptr->list(i);
 				std::cout << addr << std::endl;
 			}
-			
+
 			return true;
-			
+
 		}
-		
+
 		return false;
 	}
-	
+
 }

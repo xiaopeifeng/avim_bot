@@ -22,15 +22,12 @@ namespace fs = boost::filesystem;
 static boost::asio::io_service io_service;
 
 /*
- * 
+ *
  * 0 - group service
  * 1 - to be continued
- * 
+ *
  */
-static int service_type = 0; 
-
-static std::string keycontent;
-static std::string crtcontent;
+static int service_type = 0;
 
 int pass_cb(char *buf, int size, int rwflag, char *u)
 {
@@ -66,7 +63,7 @@ int main(int argc, char* argv[])
 	("help,h", "display this help")
 	("service", po::value<int>(&service_type)->default_value(0), "service type, 0 - client 1 - group service")
 	("to", po::value<std::string>(&to), "send test message to, default to send to your self");
-	
+
 
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
@@ -103,39 +100,31 @@ int main(int argc, char* argv[])
 
 	// 这里通过读取然后写回的方式预先将私钥的密码去除
 
-	boost::shared_ptr<BIO> keyfile(BIO_new_mem_buf(&keyfilecontent[0], keyfilecontent.length()), BIO_free);
-	boost::shared_ptr<RSA> rsa_key(
-		PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, (pem_password_cb*)pass_cb,(void*) key.c_str()),
+	std::shared_ptr<BIO> bio(BIO_new_file(key.string().c_str(), "r"), BIO_free);
+	std::shared_ptr<RSA> rsa_key(
+		PEM_read_bio_RSAPrivateKey(bio.get(), 0, (pem_password_cb*)pass_cb,(void*) key.c_str()),
 		RSA_free
 	);
 
-	keyfile.reset(BIO_new(BIO_s_mem()), BIO_free);
-	char *outbuf = 0;
-	PEM_write_bio_RSAPrivateKey(keyfile.get(),rsa_key.get(), 0, 0, 0, 0, 0);
-	rsa_key.reset();
-	auto l = BIO_get_mem_data(keyfile.get(), &outbuf);
-	keyfilecontent.assign(outbuf, l);
-	keyfile.reset();
-	
-	keycontent = keyfilecontent;
-	crtcontent = certfilecontent;
+	bio.reset(BIO_new_file(cert.string().c_str(), "r"), BIO_free);
+	std::shared_ptr<X509> x509_cert(
+		PEM_read_bio_X509(bio.get(), 0, nullptr,(void*) nullptr),
+ 		X509_free
+	);
 
-	std::cout << "get key cert conternt \n";
-	
-	boost::shared_ptr<bot_avim::bot_service> service;
-	
+	std::shared_ptr<bot_avim::bot_service> service;
+
 	if(service_type == 0)
 	{
 		std::cout << "Strat client." << std::endl;
-		service.reset(new bot_avim::bot_client(io_service, keycontent, crtcontent));
+		service.reset(new bot_avim::bot_client(io_service, rsa_key, x509_cert));
 	}
-	
-	if(service_type == 1)
+	else
 	{
-		std::cout << "Strat group service." << std::endl;
-		service.reset(new bot_avim::bot_group(io_service, keycontent, crtcontent));
+		std::cout << "Strat server." << std::endl;
+		service.reset(new bot_avim::bot_service(io_service, rsa_key, x509_cert));
 	}
-	
+
 	io_service.run();
 }
 

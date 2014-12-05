@@ -13,7 +13,7 @@
 
 namespace bot_avim {
 
-	avproto_wrapper::avproto_wrapper(boost::asio::io_service& io_service, std::string key, std::string crt)
+	avproto_wrapper::avproto_wrapper(boost::asio::io_service& io_service, std::shared_ptr<RSA> key, std::shared_ptr<X509> crt)
 	: bot_avproto(io_service, key, crt)
 	, m_avkernel(io_service)
 	{
@@ -22,17 +22,17 @@ namespace bot_avim {
 
 	avproto_wrapper::~avproto_wrapper()
 	{}
-	
+
 	bool avproto_wrapper::register_service(bot_service *service)
 	{
 		m_service.reset(service);
 	}
-	
+
 	bool avproto_wrapper::start()
 	{
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::connect_coroutine, this, std::placeholders::_1));
 	}
-	
+
 	void avproto_wrapper::connect_coroutine(boost::asio::yield_context yield_context)
 	{
 		boost::system::error_code ec;
@@ -40,20 +40,12 @@ namespace bot_avim {
 		m_avif.reset(new avjackif(m_io_service));
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::login_coroutine, this, std::placeholders::_1));
 	}
-	
+
 	bool avproto_wrapper::login_coroutine(boost::asio::yield_context yield_context)
 	{
-		boost::shared_ptr<BIO> keyfile(BIO_new_mem_buf(&m_key[0], m_key.length()), BIO_free);
-		boost::shared_ptr<BIO> certfile(BIO_new_mem_buf(&m_crt[0], m_crt.length()), BIO_free);
+		std::shared_ptr<RSA> m_rsa_key = m_key;
+		std::shared_ptr<X509> m_x509_cert = m_crt;
 
-		std::shared_ptr<RSA> m_rsa_key;
-		std::shared_ptr<X509> m_x509_cert;
-		m_rsa_key.reset(
-		PEM_read_bio_RSAPrivateKey(keyfile.get(), 0, 0, 0), //(pem_password_cb*)pass_cb,(void*) key.c_str()),
-		RSA_free
-		);
-
-		m_x509_cert.reset(PEM_read_bio_X509(certfile.get(), 0, 0, 0), X509_free);
 		m_avif->set_pki(m_rsa_key, m_x509_cert);
 		auto _debug_host = getenv("AVIM_HOST");
 		bool ret = m_avif->async_connect(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context);
@@ -63,18 +55,18 @@ namespace bot_avim {
 		{
 			std::cout << "login success " << std::endl;
 		}
-		
+
 		m_avkernel.add_interface(m_avif);
 		std::string me_addr = av_address_to_string(*m_avif->if_address());
 		m_avkernel.add_route(".+@.+", me_addr, m_avif->get_ifname(), 100);
-		
+
 		// start message_receiver
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::handle_message, this, std::placeholders::_1));
-		
+
 		m_service.get()->notify(0, 1, 0);
 		return true;
 	}
-	
+
 	bool avproto_wrapper::handle_message(boost::asio::yield_context yield_context)
 	{
 		for(;;)
@@ -88,7 +80,7 @@ namespace bot_avim {
 		}
 		return true;
 	}
-	
+
 	bool avproto_wrapper::write_packet(std::string target, std::string &pkt)
 	{
 		m_avkernel.async_sendto(target, pkt, [](boost::system::error_code ec){
@@ -98,5 +90,5 @@ namespace bot_avim {
 				std::cout << "send ok" << std::endl;
 		});
 	}
-	
+
 }

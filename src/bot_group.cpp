@@ -4,9 +4,9 @@
 
 namespace bot_avim {
 
-	bot_group::bot_group(boost::asio::io_service& io_service, std::string key, std::string crt)
-	: bot_service(io_service, key, crt)
-	, m_status(GROUP_STATUS_OFFLINE)
+	bot_group::bot_group(boost::asio::io_service& io_service, std::shared_ptr<RSA> key, std::shared_ptr<X509> crt)
+		: bot_service(io_service, key, crt)
+		, m_status(GROUP_STATUS_OFFLINE)
 	{
 		// tmp op - add member
 		add_member("hyq@avplayer.org");
@@ -18,12 +18,12 @@ namespace bot_avim {
 		add_member("zxf@avplayer.org");
 		add_member("peter@avplayer.org");
 		add_member("test-client@avplayer.org");
-		
+
 		m_avproto.reset(new avproto_wrapper(io_service, key, crt));
-		
+
 		m_avproto.get()->register_service(this);
 		m_avproto.get()->start();
-		
+
 		LOG_DBG << "bot group constructor";
 	}
 
@@ -46,7 +46,7 @@ namespace bot_avim {
 			}
 		}
 	}
-	
+
 	bool bot_group::add_member(const std::string& name)
 	{
 		m_group_member_list.push_back(name);
@@ -58,10 +58,10 @@ namespace bot_avim {
 	{
 		return true;
 	}
-	
+
 	bool bot_group::handle_message(int type, std::string &sender, im_message msgpkt)
 	{
-		
+
 		for (message::avim_message im_message_item : msgpkt.impkt.avim())
 		{
 			if (im_message_item.has_item_text())
@@ -69,15 +69,15 @@ namespace bot_avim {
 				std::cerr << im_message_item.item_text().text() << std::endl;
 			}
 		}
-		
+
 		if(sender == "group@avplayer.org")
 		{
 			std::cout << "From group, maybe test pkt" << std::endl;
 			return true;
 		}
-		
+
 		std::string content = encode_im_message(msgpkt.impkt);
-		// Send Group List to member		
+		// Send Group List to member
 		for(int i = 0; i < m_group_member_list.size(); i++)
 		{
 #if 0
@@ -88,20 +88,20 @@ namespace bot_avim {
 #endif
 			std::cout << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << sender << std::endl;
 			m_avproto.get()->write_packet(m_group_member_list.at(i), content);
-		}	
+		}
 
 		return true;
 	}
-	
+
 	bool bot_group::handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr)
 	{
 		std::cout << "get control msg" << std::endl;
-		
+
 		std::string type_name = msg_ptr.get()->GetTypeName();
 		std::string from("group@avplayer.org");
 		if(type_name == "group.group_list_request")
 		{
-			// response 
+			// response
 			proto::group::list_response response;
 			response.set_result(proto::group::list_response::result_code::list_response_result_code_OK);
 			std::string *addr;
@@ -110,11 +110,11 @@ namespace bot_avim {
 				addr = response.add_list();
 				addr->append(m_group_member_list.at(i));
 			}
-			std::string response_content = encode_control_message(from, response);	
+			std::string response_content = encode_control_message(from, response);
 			m_avproto.get()->write_packet(sender, response_content);
 		}
-		
+
 		return true;
 	}
-	
+
 }
