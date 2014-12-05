@@ -59,14 +59,23 @@ namespace bot_avim {
 		return true;
 	}
 
-	bool bot_group::handle_message(int type, std::string &sender, im_message msgpkt)
+	bool bot_group::handle_message(const std::string& sender, const std::string& content)
 	{
-
-		for (message::avim_message im_message_item : msgpkt.impkt.avim())
+		if ( sender != group_message_get_sender(content))
 		{
-			if (im_message_item.has_item_text())
+			// 不给转发!
+			return false;
+		}
+
+		if (!is_encrypted_message(content))
+		{
+			// 没有使用 group 加密, 可以解码并打印
+			for (message::avim_message im_message_item : decode_im_message(content).impkt.avim())
 			{
-				std::cerr << im_message_item.item_text().text() << std::endl;
+				if (im_message_item.has_item_text())
+				{
+					std::cerr << im_message_item.item_text().text() << std::endl;
+				}
 			}
 		}
 
@@ -76,7 +85,6 @@ namespace bot_avim {
 			return true;
 		}
 
-		std::string content = encode_im_message(msgpkt.impkt);
 		// Send Group List to member
 		for(int i = 0; i < m_group_member_list.size(); i++)
 		{

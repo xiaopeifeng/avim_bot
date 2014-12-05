@@ -47,8 +47,17 @@ namespace bot_avim {
 		}
 	}
 
-	bool bot_client::handle_message(int type, std::string &sender, im_message msgpkt)
+	bool bot_client::handle_message(const std::string& sender, const std::string& content)
 	{
+		if (is_encrypted_message(content))
+		{
+			// TODO
+			std::string key = "解码 group 消息的对称密码";
+			// TODO decode_im_message(key, content);
+		}
+
+		im_message msgpkt = decode_im_message(content);
+
 		std::cout << "get im message" << std::endl;
 
 		for (message::avim_message im_message_item : msgpkt.impkt.avim())

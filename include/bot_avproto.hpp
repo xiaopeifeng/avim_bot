@@ -30,7 +30,7 @@ namespace bot_avim {
 	public:
 		virtual bool register_service(bot_service *service){m_service.reset(service); return true;};
 		virtual bool start(){return true;};
-		virtual bool write_packet(std::string target, std::string &pkt){return true;};
+		virtual bool write_packet(const std::string& target, const std::string &pkt){return true;};
 
 	protected:
 		boost::asio::io_service& m_io_service;

@@ -71,12 +71,12 @@ namespace bot_avim {
 	{
 		for(;;)
 		{
-			std::string target,data;
+			std::string target, data;
 			m_avkernel.async_recvfrom(target, data, yield_context);
 			if(is_control_message(data))
 				m_service.get()->handle_message(0,target, decode_control_message(data));
 			else
-				m_service.get()->handle_message(0,target, decode_im_message(data));
+				m_service.get()->handle_message(target, data);
 		}
 		return true;
 	}

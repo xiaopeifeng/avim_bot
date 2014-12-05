@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 	else
 	{
 		std::cout << "Strat server." << std::endl;
-		service.reset(new bot_avim::bot_service(io_service, rsa_key, x509_cert));
+		service.reset(new bot_avim::bot_group(io_service, rsa_key, x509_cert));
 	}
 
 	io_service.run();

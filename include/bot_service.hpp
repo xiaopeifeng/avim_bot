@@ -28,7 +28,7 @@ namespace bot_avim {
 		~bot_service(){};
 
 	public:
-		virtual bool handle_message(int type, std::string &sender, im_message pkt){return true;};
+		virtual bool handle_message(const std::string& sender, const std::string& content) = 0;
 		virtual bool handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr){return true;};
 		virtual bool notify(int cmd, int ext1 = 0, int ext2 = 0){return true;};
 
