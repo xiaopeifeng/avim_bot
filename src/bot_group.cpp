@@ -39,7 +39,7 @@ namespace bot_avim {
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
-				std::string content = encode_message(pkt);
+				std::string content = encode_im_message(pkt);
 				m_avproto.get()->write_packet("group@avplayer.org", content);
 				return true;
 			}
@@ -58,9 +58,11 @@ namespace bot_avim {
 		return true;
 	}
 	
-	bool bot_group::handle_message(int type, std::string &sender, im_message msgpkt)
+	bool bot_group::handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr)
 	{
 		std::cout << "get pkt" << std::endl;
+		
+#if 0
 #if 0
 		if(msgpkt.is_group_message == 0)
 		{
@@ -75,7 +77,7 @@ namespace bot_avim {
 				std::cout << "start pause" << std::endl;
 				std::cerr << im_message_item.item_text().text() << std::endl;
 			}
-			
+#if 0		
 			// handle group request
 			if(im_message_item.has_item_group_request())
 			{
@@ -100,15 +102,15 @@ namespace bot_avim {
 				std::cout << "response group list ok" << std::endl;
 				return true;
 			}
+#endif	
 		}
-		
 		if(sender == "group@avplayer.org")
 		{
 			std::cout << "From group, maybe test pkt" << std::endl;
 			return true;
 		}
 		
-		std::string content = encode_message(msgpkt.impkt);
+		std::string content = encode_im_message(msgpkt.impkt);
 		// Send Group List to member		
 		for(int i = 0; i < m_group_member_list.size(); i++)
 		{
@@ -119,6 +121,7 @@ namespace bot_avim {
 			std::cout << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << sender << std::endl;
 			m_avproto.get()->write_packet(m_group_member_list.at(i), content);
 		}	
+#endif
 		
 		return true;
 	}

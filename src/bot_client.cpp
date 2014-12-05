@@ -28,17 +28,17 @@ namespace bot_avim {
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
-				std::string content = encode_message(pkt);
+				std::string content = encode_im_message(pkt);
 				m_avproto.get()->write_packet("group@avplayer.org", content);
 				
 				// get group list
-#if 1
+#if 0	
 				message::message_packet request_pkt;
 				message::group_request *request = request_pkt.mutable_avim()->Add()->mutable_item_group_request();
 				request->set_group_id(0);
 				request->set_request_id(message::group_request::request_type::group_request_request_type_GROUP_REQUEST_LIST);
 				request->set_group_name("avim main group");
-				std::string request_content = encode_message(request_pkt);
+				std::string request_content = encode_control_message(request_pkt);
 				m_avproto.get()->write_packet("group@avplayer.org", request_content);
 #endif
 				return true;
@@ -46,40 +46,46 @@ namespace bot_avim {
 		}
 	}
 	
-	bool bot_client::handle_message(int type, std::string &sender, im_message msgpkt)
+	bool bot_client::handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr)
 	{
 		std::cout << "get pkt" << std::endl;
-		
-		for (message::avim_message im_message_item : msgpkt.impkt.avim())
+		const std::string msg_type = msg_ptr.get()->GetTypeName();
+
+		if(msg_type == "message.message_packet")
 		{
-			if (im_message_item.has_item_text())
+			message::message_packet *msgpkt = dynamic_cast<message::message_packet*>(msg_ptr.get());
+			for (message::avim_message im_message_item : msgpkt->avim())
 			{
-				std::cerr << im_message_item.item_text().text() << std::endl;
-			}
-			
-			if(im_message_item.has_item_group_response())
-			{
-				std::cout << "receive group list response" << std::endl;
-				if(im_message_item.item_group_response().result() != message::group_response::result_code::group_response_result_code_OK)
+				if (im_message_item.has_item_text())
 				{
-					std::cout << "group request failed " << std::endl;
-					return false;
+					std::cerr << im_message_item.item_text().text() << std::endl;
 				}
-				
-				if(im_message_item.item_group_response().response_id() == 0)
+	#if 0
+				if(im_message_item.has_item_group_response())
 				{
-					std::cout << "group list query result " << std::endl;
-					int size = im_message_item.item_group_response().group_list_item().member_list_item_size();
-					std::cout << "list count " << size << std::endl;
-					for(int i=0; i < size; i++)
+					std::cout << "receive group list response" << std::endl;
+					if(im_message_item.item_group_response().result() != message::group_response::result_code::group_response_result_code_OK)
 					{
-						message::group_list::member_list addr = im_message_item.item_group_response().group_list_item().member_list_item(i);
-						std::cout << addr.addr() << std::endl;
+						std::cout << "group request failed " << std::endl;
+						return false;
 					}
+					
+					if(im_message_item.item_group_response().response_id() == 0)
+					{
+						std::cout << "group list query result " << std::endl;
+						int size = im_message_item.item_group_response().group_list_item().member_list_item_size();
+						std::cout << "list count " << size << std::endl;
+						for(int i=0; i < size; i++)
+						{
+							message::group_list::member_list addr = im_message_item.item_group_response().group_list_item().member_list_item(i);
+							std::cout << addr.addr() << std::endl;
+						}
+					}
+					
 				}
+	#endif
 				
 			}
-			
 		}
 		
 		return true;

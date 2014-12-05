@@ -107,7 +107,7 @@ namespace bot_avim {
 		{
 			std::string target,data;
 			m_avkernel.async_recvfrom(target, data, yield_context);
-			m_service.get()->handle_message(0,target, decode_message(data));
+			m_service.get()->handle_message(0,target, decode_control_message(data));
 		}
 		return true;
 	}
