@@ -32,11 +32,14 @@ namespace bot_avim {
 				m_avproto.get()->write_packet("group@avplayer.org", content);
 				
 				// get group list
-#if 0
-				proto::group::group_list_request request;
-				request.set_group_id(0);
-				request.set_group_name("avim main group");
-				m_avproto.get()->write_packet("group@avplayer.org", request);
+#if 1
+				message::message_packet request_pkt;
+				message::group_request *request = request_pkt.mutable_avim()->Add()->mutable_item_group_request();
+				request->set_group_id(0);
+				request->set_request_id(message::group_request::request_type::group_request_request_type_GROUP_REQUEST_LIST);
+				request->set_group_name("avim main group");
+				std::string request_content = encode_message(request_pkt);
+				m_avproto.get()->write_packet("group@avplayer.org", request_content);
 #endif
 				return true;
 			}
@@ -47,18 +50,36 @@ namespace bot_avim {
 	{
 		std::cout << "get pkt" << std::endl;
 		
-		if(msgpkt.is_message == 0)
-		{
-			return false;
-		}
-		
-		
 		for (message::avim_message im_message_item : msgpkt.impkt.avim())
 		{
 			if (im_message_item.has_item_text())
 			{
 				std::cerr << im_message_item.item_text().text() << std::endl;
 			}
+			
+			if(im_message_item.has_item_group_response())
+			{
+				std::cout << "receive group list response" << std::endl;
+				if(im_message_item.item_group_response().result() != message::group_response::result_code::group_response_result_code_OK)
+				{
+					std::cout << "group request failed " << std::endl;
+					return false;
+				}
+				
+				if(im_message_item.item_group_response().response_id() == 0)
+				{
+					std::cout << "group list query result " << std::endl;
+					int size = im_message_item.item_group_response().group_list_item().member_list_item_size();
+					std::cout << "list count " << size << std::endl;
+					for(int i=0; i < size; i++)
+					{
+						message::group_list::member_list addr = im_message_item.item_group_response().group_list_item().member_list_item(i);
+						std::cout << addr.addr() << std::endl;
+					}
+				}
+				
+			}
+			
 		}
 		
 		return true;

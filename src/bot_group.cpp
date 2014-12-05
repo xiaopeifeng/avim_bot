@@ -72,7 +72,33 @@ namespace bot_avim {
 		{
 			if (im_message_item.has_item_text())
 			{
+				std::cout << "start pause" << std::endl;
 				std::cerr << im_message_item.item_text().text() << std::endl;
+			}
+			
+			// handle group request
+			if(im_message_item.has_item_group_request())
+			{
+				std::cout << "shit start parse" << std::endl;
+				message::message_packet response_pkt;
+				message::group_response response;
+				response.set_response_id(0);
+				response.set_result(message::group_response_result_code::group_response_result_code_OK);
+				message::group_list *list_item = response.mutable_group_list_item();
+				list_item->set_count(m_group_member_list.size());
+				message::group_list::member_list *addr_item;
+				for(int i = 0; i < m_group_member_list.size(); i++)
+				{
+					addr_item = list_item->add_member_list_item();
+					addr_item->set_addr(m_group_member_list.at(i));					
+				}
+				
+				response_pkt.mutable_avim()->Add()->mutable_item_group_response()->CopyFrom(response);
+				std::string response_content = encode_message(response_pkt);
+				m_avproto.get()->write_packet(sender, response_content);
+				
+				std::cout << "response group list ok" << std::endl;
+				return true;
 			}
 		}
 		
