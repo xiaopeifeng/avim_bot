@@ -102,8 +102,8 @@ namespace bot_avim {
 		if(type_name == "group.group_list_request")
 		{
 			// response 
-			group::group_list_response response;
-			response.set_result(group::group_list_response::result_code::group_list_response_result_code_OK);
+			proto::group::list_response response;
+			response.set_result(proto::group::list_response::result_code::list_response_result_code_OK);
 			std::string *addr;
 			for(int i = 0; i < m_group_member_list.size(); i++)
 			{

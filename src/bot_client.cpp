@@ -35,8 +35,8 @@ namespace bot_avim {
 				
 				// get group list
 #if 1				
-				group::group_list_request request;
-				request.set_group_id(0);
+				proto::group::list_request request;
+				request.set_id(0);
 				std::string addr_group("group@avplayer.org");
 				std::string from("peter@avplayer.org");
 				std::string group_content = encode_control_message(from, request);
@@ -66,12 +66,12 @@ namespace bot_avim {
 	{
 		std::cout << "get pkt" << std::endl;
 		const std::string type_name = msg_ptr.get()->GetTypeName();
-
-		if(type_name == "group.group_list_response")
+		std::cout << type_name << std::endl;
+		if(type_name == "proto.group.list_response")
 		{
-			group::group_list_response *response_ptr = dynamic_cast<group::group_list_response *>(msg_ptr.get());
+			proto::group::list_response *response_ptr = dynamic_cast<proto::group::list_response *>(msg_ptr.get());
 			std::cout << "receive group list response" << std::endl;
-			if(response_ptr->result() != group::group_list_response_result_code::group_list_response_result_code_OK)
+			if(response_ptr->result() != proto::group::list_response_result_code::list_response_result_code_OK)
 			{
 				std::cout << "group request failed " << std::endl;
 				return false;
