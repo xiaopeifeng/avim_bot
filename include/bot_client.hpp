@@ -30,7 +30,7 @@ namespace bot_avim {
 		~bot_client();
 
 	public:
-		
+		bool handle_message(int type, std::string &sender, im_message pkt);
 		bool handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr);
 		bool notify(int cmd, int ext1, int ext2);
 		

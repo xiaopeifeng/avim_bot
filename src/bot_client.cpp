@@ -1,5 +1,6 @@
 #include "logging.hpp"
 #include "bot_client.hpp"
+#include "group.pb.h"
 
 namespace bot_avim {
 
@@ -29,66 +30,66 @@ namespace bot_avim {
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
 				std::string content = encode_im_message(pkt);
-				m_avproto.get()->write_packet("group@avplayer.org", content);
+				std::string target("group@avplayer.org");
+				m_avproto.get()->write_packet(target, content);
 				
 				// get group list
-#if 0	
-				message::message_packet request_pkt;
-				message::group_request *request = request_pkt.mutable_avim()->Add()->mutable_item_group_request();
-				request->set_group_id(0);
-				request->set_request_id(message::group_request::request_type::group_request_request_type_GROUP_REQUEST_LIST);
-				request->set_group_name("avim main group");
-				std::string request_content = encode_control_message(request_pkt);
-				m_avproto.get()->write_packet("group@avplayer.org", request_content);
+#if 1				
+				proto::group::list_request request;
+				request.set_id(0);
+				std::string addr_group("group@avplayer.org");
+				std::string from("peter@avplayer.org");
+				std::string group_content = encode_control_message(from, request);
+				m_avproto.get()->write_packet(addr_group, group_content);
 #endif
 				return true;
 			}
 		}
 	}
 	
-	bool bot_client::handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr)
+	bool bot_client::handle_message(int type, std::string &sender, im_message msgpkt)
 	{
-		std::cout << "get pkt" << std::endl;
-		const std::string msg_type = msg_ptr.get()->GetTypeName();
+		std::cout << "get im message" << std::endl;
 
-		if(msg_type == "message.message_packet")
+		for (message::avim_message im_message_item : msgpkt.impkt.avim())
 		{
-			message::message_packet *msgpkt = dynamic_cast<message::message_packet*>(msg_ptr.get());
-			for (message::avim_message im_message_item : msgpkt->avim())
+			if (im_message_item.has_item_text())
 			{
-				if (im_message_item.has_item_text())
-				{
-					std::cerr << im_message_item.item_text().text() << std::endl;
-				}
-	#if 0
-				if(im_message_item.has_item_group_response())
-				{
-					std::cout << "receive group list response" << std::endl;
-					if(im_message_item.item_group_response().result() != message::group_response::result_code::group_response_result_code_OK)
-					{
-						std::cout << "group request failed " << std::endl;
-						return false;
-					}
-					
-					if(im_message_item.item_group_response().response_id() == 0)
-					{
-						std::cout << "group list query result " << std::endl;
-						int size = im_message_item.item_group_response().group_list_item().member_list_item_size();
-						std::cout << "list count " << size << std::endl;
-						for(int i=0; i < size; i++)
-						{
-							message::group_list::member_list addr = im_message_item.item_group_response().group_list_item().member_list_item(i);
-							std::cout << addr.addr() << std::endl;
-						}
-					}
-					
-				}
-	#endif
-				
+				std::cerr << im_message_item.item_text().text() << std::endl;
 			}
 		}
 		
 		return true;
+	}
+	
+	bool bot_client::handle_message(int type, std::string &sender, std::shared_ptr<google::protobuf::Message> msg_ptr)
+	{
+		std::cout << "get pkt" << std::endl;
+		const std::string type_name = msg_ptr.get()->GetTypeName();
+		std::cout << type_name << std::endl;
+		if(type_name == "proto.group.list_response")
+		{
+			proto::group::list_response *response_ptr = dynamic_cast<proto::group::list_response *>(msg_ptr.get());
+			std::cout << "receive group list response" << std::endl;
+			if(response_ptr->result() != proto::group::list_response_result_code::list_response_result_code_OK)
+			{
+				std::cout << "group request failed " << std::endl;
+				return false;
+			}
+			
+			int size = response_ptr->list_size();
+			std::cout << "list count " << size << std::endl;
+			for(int i=0; i < size; i++)
+			{
+				std::string addr = response_ptr->list(i);
+				std::cout << addr << std::endl;
+			}
+			
+			return true;
+			
+		}
+		
+		return false;
 	}
 	
 }

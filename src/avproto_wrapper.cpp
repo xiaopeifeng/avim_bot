@@ -37,32 +37,6 @@ namespace bot_avim {
 	{
 		boost::system::error_code ec;
 		using namespace boost::asio::ip;
-#if 0
-		tcp::resolver resolver(m_io_service);
-
-		auto _debug_host = getenv("AVIM_HOST");
-		tcp::resolver::query query(_debug_host?_debug_host:"avim.avplayer.org", "24950");
-
-		auto endpoint_iterator = resolver.async_resolve(query, yield_context[ec]);
-
-		if (ec || endpoint_iterator == tcp::resolver::iterator())
-		{
-			std::cout << "server not found" << std::endl;
-			return;
-		}
-
-		m_socket.reset(new tcp::socket(m_io_service));
-
-		boost::asio::async_connect(*m_socket, endpoint_iterator, yield_context[ec]);
-
-		if (ec)
-		{
-			std::cout << "connection failed, msg: " << ec.message() << std::endl;
-			return;
-		}
-		std::cout << "connection established " << std::endl;
-		//m_avif.reset(new avjackif(m_socket));
-#endif
 		m_avif.reset(new avjackif(m_io_service));
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::login_coroutine, this, std::placeholders::_1));
 	}
@@ -107,7 +81,10 @@ namespace bot_avim {
 		{
 			std::string target,data;
 			m_avkernel.async_recvfrom(target, data, yield_context);
-			m_service.get()->handle_message(0,target, decode_control_message(data));
+			if(is_control_message(data))
+				m_service.get()->handle_message(0,target, decode_control_message(data));
+			else
+				m_service.get()->handle_message(0,target, decode_im_message(data));
 		}
 		return true;
 	}
