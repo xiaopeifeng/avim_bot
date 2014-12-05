@@ -21,14 +21,6 @@ namespace fs = boost::filesystem;
 
 static boost::asio::io_service io_service;
 
-/*
- *
- * 0 - group service
- * 1 - to be continued
- *
- */
-static int service_type = 0;
-
 int pass_cb(char *buf, int size, int rwflag, char *u)
 {
 	int len;
@@ -61,7 +53,7 @@ int main(int argc, char* argv[])
 	("key", po::value<fs::path>(&key)->default_value("group.key"), "path to private key")
 	("cert", po::value<fs::path>(&cert)->default_value("group.crt"), "path to cert")
 	("help,h", "display this help")
-	("service", po::value<int>(&service_type)->default_value(0), "service type, 0 - client 1 - group service")
+	("service", "service type, 0 - client 1 - group service")
 	("to", po::value<std::string>(&to), "send test message to, default to send to your self");
 
 
@@ -114,7 +106,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<bot_avim::bot_service> service;
 
-	if(service_type == 0)
+	if(boost::any_cast<int>(vm["service"]) == 0)
 	{
 		std::cout << "Strat client." << std::endl;
 		service.reset(new bot_avim::bot_client(io_service, rsa_key, x509_cert));
@@ -127,5 +119,3 @@ int main(int argc, char* argv[])
 
 	io_service.run();
 }
-
-
