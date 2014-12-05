@@ -1,8 +1,6 @@
 #include "logging.hpp"
 #include "bot_client.hpp"
 
-#include "group.pb.h"
-
 namespace bot_avim {
 
 	bot_client::bot_client(boost::asio::io_service& io_service, std::string key, std::string crt)
