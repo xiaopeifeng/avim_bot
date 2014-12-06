@@ -35,7 +35,7 @@ namespace bot_avim {
 				std::cout << "send test pkt ok" << std::endl;
 
 				// get group list
-#if 0
+#if 1
 				proto::group::list_request request;
 				request.set_id(0);
 				std::string addr_group("group@avplayer.org");

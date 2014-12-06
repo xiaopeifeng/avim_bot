@@ -107,7 +107,7 @@ namespace bot_avim {
 
 		std::string type_name = msg_ptr.get()->GetTypeName();
 		std::string from("group@avplayer.org");
-		if(type_name == "group.group_list_request")
+		if(type_name == "proto.group.list_request")
 		{
 			// response
 			proto::group::list_response response;
