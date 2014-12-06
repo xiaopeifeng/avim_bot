@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
 	);
 
 	std::shared_ptr<bot_avim::bot_service> service;
-
-	if(boost::any_cast<int>(vm["service"]) == 0)
+	
+	if(vm.count("service") == 0)
 	{
 		std::cout << "Strat client." << std::endl;
 		service.reset(new bot_avim::bot_client(io_service, rsa_key, x509_cert));
