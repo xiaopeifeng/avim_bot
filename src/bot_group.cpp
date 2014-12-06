@@ -34,16 +34,24 @@ namespace bot_avim {
 	{
 		if(cmd == CMD_STATE_CHANGED)
 		{
-			m_status = static_cast<group_status>(ext1);
-			if(m_status == GROUP_STATUS_ONLINE)
+			
+			if(static_cast<group_status>(ext1) == GROUP_STATUS_ONLINE)
 			{
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
 				std::string content = encode_im_message(pkt);
-				m_avproto.get()->write_packet("group@avplayer.org", content);
-				return true;
+				m_avproto.get()->write_packet("group@avplayer.org", content);	
 			}
+			
+			if(static_cast<group_status>(ext1) == GROUP_STATUS_OFFLINE)
+			{
+				// reconnect
+				std::cout << "disconnect from server, retry" << std::endl;
+				m_avproto.get()->start();
+			}
+			m_status = static_cast<group_status>(ext1);
+			return true;
 		}
 	}
 

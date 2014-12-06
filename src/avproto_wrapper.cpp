@@ -50,8 +50,8 @@ namespace bot_avim {
 
 		m_avif->set_pki(m_rsa_key, m_x509_cert);
 		auto _debug_host = getenv("AVIM_HOST");
-		bool ret = m_avif->async_connect(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context);
-		//bool ret = m_avif->async_connect("127.0.0.1", "24950", yield_context);
+		//bool ret = m_avif->async_connect(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context);
+		bool ret = m_avif->async_connect("127.0.0.1", "24950", yield_context);
 		std::cout << "connect ok" << std::endl;
 		if (m_avif->async_handshake(yield_context))
 		{
@@ -66,6 +66,12 @@ namespace bot_avim {
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::handle_message, this, std::placeholders::_1));
 
 		m_service.get()->notify(0, 1, 0);
+		
+		//reconnect
+		m_avif->signal_notify_remove.connect([this](){
+			m_service.get()->notify(0, 0, 0);
+		});
+		
 		return true;
 	}
 
