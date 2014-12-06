@@ -30,11 +30,12 @@ namespace bot_avim {
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
 				std::string content = encode_im_message(pkt);
-				std::string target("group@avplayer.org");
+				std::string target("peter@avplayer.org");
 				m_avproto.get()->write_packet(target, content);
+				std::cout << "send test pkt ok" << std::endl;
 
 				// get group list
-#if 1
+#if 0
 				proto::group::list_request request;
 				request.set_id(0);
 				std::string addr_group("group@avplayer.org");
@@ -49,6 +50,7 @@ namespace bot_avim {
 
 	bool bot_client::handle_message(const std::string& sender, const std::string& content)
 	{
+		std::cout << "get im message" << std::endl;
 		if (is_encrypted_message(content))
 		{
 			// TODO

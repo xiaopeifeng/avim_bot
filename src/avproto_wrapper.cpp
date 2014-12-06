@@ -49,8 +49,8 @@ namespace bot_avim {
 		m_avif->set_pki(m_rsa_key, m_x509_cert);
 		auto _debug_host = getenv("AVIM_HOST");
 		bool ret = m_avif->async_connect(_debug_host?_debug_host:"avim.avplayer.org", "24950", yield_context);
-		std::cout << "connect ok" << std::endl;
 		//bool ret = m_avif->async_connect("127.0.0.1", "24950", yield_context);
+		std::cout << "connect ok" << std::endl;
 		if (m_avif->async_handshake(yield_context))
 		{
 			std::cout << "login success " << std::endl;
@@ -81,7 +81,7 @@ namespace bot_avim {
 		return true;
 	}
 
-	bool avproto_wrapper::write_packet(std::string target, std::string &pkt)
+	bool avproto_wrapper::write_packet(const std::string &target, const std::string &pkt)
 	{
 		m_avkernel.async_sendto(target, pkt, [](boost::system::error_code ec){
 			if(ec)

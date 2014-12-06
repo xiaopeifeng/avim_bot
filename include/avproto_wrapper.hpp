@@ -37,7 +37,7 @@ namespace bot_avim {
 	public:
 		virtual bool register_service(bot_service *service);
 		virtual bool start();
-		virtual bool write_packet(std::string target, std::string &pkt);
+		virtual bool write_packet(const std::string &target,const std::string &pkt);
 
 	public:
 		void connect_coroutine(boost::asio::yield_context yield_context);

@@ -28,7 +28,7 @@ namespace bot_avim {
 		~bot_avproto(){};
 
 	public:
-		virtual bool register_service(bot_service *service){m_service.reset(service); return true;};
+		virtual bool register_service(bot_service *service){return true;};
 		virtual bool start(){return true;};
 		virtual bool write_packet(const std::string& target, const std::string &pkt){return true;};
 
