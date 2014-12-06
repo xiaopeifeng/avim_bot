@@ -14,7 +14,9 @@
 namespace bot_avim {
 
 	avproto_wrapper::avproto_wrapper(boost::asio::io_service& io_service, std::shared_ptr<RSA> key, std::shared_ptr<X509> crt)
-	: bot_avproto(io_service, key, crt)
+	: m_io_service(io_service)
+	, m_key(key)
+	, m_crt(crt)
 	, m_avkernel(io_service)
 	{
 		LOG_DBG << "avproto constructor";

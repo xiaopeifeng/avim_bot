@@ -39,7 +39,7 @@ namespace bot_avim {
 
 	private:
 		client_status m_status;
-		boost::shared_ptr<bot_avproto> m_avproto;
+		boost::shared_ptr<avproto_wrapper> m_avproto;
 	};
 
 }

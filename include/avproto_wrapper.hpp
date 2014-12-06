@@ -7,10 +7,10 @@
 #include <boost/asio/spawn.hpp>
 
 #include "avproto/serialization.hpp"
-#include "packet.pb.h"
-
-#include "bot_avproto.hpp"
 #include "avproto.hpp"
+
+#include "packet.pb.h"
+#include "im.pb.h"
 
 class avjackif;
 class avkernel;
@@ -28,16 +28,16 @@ namespace bot_avim {
 	};
 
 	class avproto_wrapper
-		: public bot_avproto
+		: public boost::noncopyable
 	{
 	public:
 		explicit avproto_wrapper(boost::asio::io_service& io_service, std::shared_ptr<RSA> key, std::shared_ptr<X509> crt);
 		~avproto_wrapper();
 
 	public:
-		virtual bool register_service(bot_service *service);
-		virtual bool start();
-		virtual bool write_packet(const std::string &target,const std::string &pkt);
+		bool register_service(bot_service *service);
+		bool start();
+		bool write_packet(const std::string &target,const std::string &pkt);
 
 	public:
 		void connect_coroutine(boost::asio::yield_context yield_context);
@@ -45,6 +45,11 @@ namespace bot_avim {
 		bool handle_message(boost::asio::yield_context yield_context);
 
 	private:
+		boost::asio::io_service& m_io_service;
+		std::shared_ptr<RSA> m_key;
+		std::shared_ptr<X509> m_crt;
+		boost::shared_ptr<bot_service> m_service;
+		
 		std::shared_ptr<avjackif> m_avif;
 		avkernel m_avkernel;
 	};

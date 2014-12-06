@@ -48,8 +48,7 @@ namespace bot_avim {
 	private:
 		member_ptr m_group_member_list;
 		group_status m_status;
-		boost::shared_ptr<bot_avproto> m_avproto;
-		//avproto_wrapper m_avproto;
+		boost::shared_ptr<avproto_wrapper> m_avproto;
 	};
 
 }
