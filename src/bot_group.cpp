@@ -69,6 +69,7 @@ namespace bot_avim {
 
 	bool bot_group::handle_message(const std::string& sender, const std::string& content)
 	{
+#if 0
 		if ( sender != group_message_get_sender(content))
 		{
 			// 不给转发!
@@ -86,6 +87,7 @@ namespace bot_avim {
 				}
 			}
 		}
+#endif
 
 		if(sender == "group@avplayer.org")
 		{
