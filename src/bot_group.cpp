@@ -37,11 +37,12 @@ namespace bot_avim {
 			
 			if(static_cast<group_status>(ext1) == GROUP_STATUS_ONLINE)
 			{
+				return true;
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
 				std::string content = encode_im_message(pkt);
-				m_avproto.get()->write_packet("group@avplayer.org", content);	
+				m_avproto.get()->write_packet("group@avplayer.org", content);
 			}
 			
 			if(static_cast<group_status>(ext1) == GROUP_STATUS_OFFLINE)
@@ -75,10 +76,14 @@ namespace bot_avim {
 			// 不给转发!
 			return false;
 		}
+#endif
 
+#if 1
 		if (!is_encrypted_message(content))
 		{
+			std::cout << "display message:" << content << std::endl;
 			// 没有使用 group 加密, 可以解码并打印
+#if 0
 			for (message::avim_message im_message_item : decode_im_message(content).impkt.avim())
 			{
 				if (im_message_item.has_item_text())
@@ -86,6 +91,7 @@ namespace bot_avim {
 					std::cerr << im_message_item.item_text().text() << std::endl;
 				}
 			}
+#endif
 		}
 #endif
 
@@ -105,7 +111,7 @@ namespace bot_avim {
 			}
 #endif
 			std::cout << "Trans avpkt to: " << m_group_member_list.at(i) <<" From: " << sender << std::endl;
-			m_avproto.get()->write_packet(m_group_member_list.at(i), content);
+			m_avproto.get()->write_packet(m_group_member_list.at(i),content);
 		}
 
 		return true;

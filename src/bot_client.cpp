@@ -28,7 +28,7 @@ namespace bot_avim {
 			{
 				// send test pkt
 				message::message_packet pkt;
-				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test");
+				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test - back");
 				std::string content = encode_im_message(pkt);
 				std::string target("peter@avplayer.org");
 				m_avproto.get()->write_packet(target, content);
@@ -43,6 +43,8 @@ namespace bot_avim {
 				std::string group_content = encode_control_message(from, request);
 				m_avproto.get()->write_packet(addr_group, group_content);
 #endif
+				m_avproto.get()->write_packet(addr_group, content);
+				
 				return true;
 			}
 		}
@@ -55,9 +57,10 @@ namespace bot_avim {
 		{
 			// TODO
 			std::string key = "解码 group 消息的对称密码";
+			std::cout << key << std::endl;
 			// TODO decode_im_message(key, content);
 		}
-
+std::cout << "display message:"<< content << std::endl;
 		im_message msgpkt = decode_im_message(content);
 
 		std::cout << "get im message" << std::endl;
