@@ -37,7 +37,7 @@ namespace bot_avim {
 	public:
 		bool register_service(bot_service *service);
 		bool start();
-		const std::string& get_my_addr();
+		const std::string& get_local_addr();
 
 	public:
 		void connect_coroutine(boost::asio::yield_context yield_context);
@@ -53,6 +53,7 @@ namespace bot_avim {
 		
 		std::shared_ptr<avjackif> m_avif;
 		avkernel m_avkernel;
+		std::string m_local_addr;
 	};
 
 }

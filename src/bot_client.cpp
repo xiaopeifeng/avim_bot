@@ -29,7 +29,7 @@ namespace bot_avim {
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test - back");
-				m_avproto.get()->write_packet(m_avproto.get()->get_my_addr(), encode_im_message(pkt));
+				m_avproto.get()->write_packet(m_avproto.get()->get_local_addr(), encode_im_message(pkt));
 				std::cout << "send test pkt ok" << std::endl;
 
 				// get group list
@@ -41,7 +41,7 @@ namespace bot_avim {
 				std::string group_content = encode_control_message(from, request);
 				m_avproto.get()->write_packet(addr_group, group_content);
 #endif
-				m_avproto.get()->write_packet(addr_group, content);
+				m_avproto.get()->write_packet(addr_group, encode_im_message(pkt));
 				
 				return true;
 			}
