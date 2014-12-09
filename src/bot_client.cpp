@@ -60,11 +60,7 @@ namespace bot_avim {
 			std::cout << key << std::endl;
 			// TODO decode_im_message(key, content);
 		}
-std::cout << "display message:"<< content << std::endl;
 		im_message msgpkt = decode_im_message(content);
-
-		std::cout << "get im message" << std::endl;
-
 		for (message::avim_message im_message_item : msgpkt.impkt.avim())
 		{
 			if (im_message_item.has_item_text())
