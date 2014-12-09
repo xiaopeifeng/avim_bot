@@ -34,6 +34,11 @@ namespace bot_avim {
 	{
 		boost::asio::spawn(m_io_service, std::bind(&avproto_wrapper::connect_coroutine, this, std::placeholders::_1));
 	}
+	
+	const std::string& avproto_wrapper::get_my_addr()
+	{
+		return av_address_to_string(*m_avif->if_address());
+	}
 
 	void avproto_wrapper::connect_coroutine(boost::asio::yield_context yield_context)
 	{

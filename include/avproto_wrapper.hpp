@@ -37,12 +37,13 @@ namespace bot_avim {
 	public:
 		bool register_service(bot_service *service);
 		bool start();
-		bool write_packet(const std::string &target,const std::string &pkt);
+		const std::string& get_my_addr();
 
 	public:
 		void connect_coroutine(boost::asio::yield_context yield_context);
 		bool login_coroutine(boost::asio::yield_context yield_context);
 		bool handle_message(boost::asio::yield_context yield_context);
+		bool write_packet(const std::string &target,const std::string &pkt);
 
 	private:
 		boost::asio::io_service& m_io_service;

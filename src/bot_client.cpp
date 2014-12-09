@@ -29,9 +29,7 @@ namespace bot_avim {
 				// send test pkt
 				message::message_packet pkt;
 				pkt.mutable_avim()->Add()->mutable_item_text()->set_text("test - back");
-				std::string content = encode_im_message(pkt);
-				std::string target("peter@avplayer.org");
-				m_avproto.get()->write_packet(target, content);
+				m_avproto.get()->write_packet(m_avproto.get()->get_my_addr(), encode_im_message(pkt));
 				std::cout << "send test pkt ok" << std::endl;
 
 				// get group list
